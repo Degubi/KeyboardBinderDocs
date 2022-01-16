@@ -1,0 +1,70 @@
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    height: 100vh;
+}
+
+#content {
+    margin: 0;
+    width: 85%;
+    padding: 0px 20px;
+    color: white;
+    overflow: auto;
+    background-color: #1e1e1e;
+    border-left: 3px solid gray;
+}
+
+#sidenav {
+    width: 15%;
+    background-color: #111;
+    padding-top: 20px;
+}
+
+#sidenav button {
+    padding: 8px 8px 8px 16px;
+    font-size: 20px;
+    color: white;
+    display: block;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+#sidenav button:hover {
+    color: lightgreen;
+    background-color: #4b4b4b;
+}
+
+.dropdown-container {
+    display: none;
+    background-color: #262626;
+    padding-left: 8px;
+}
+
+.code-example {
+    display: inline-block;
+    background-color: #262626;
+    border: solid 1px #4b4b4b;
+    padding: 5px;
+    margin: 0px 0px 15px 0px;
+}
+
+.integer-param {
+    color: #a7ffa4;
+}
+
+.enum-param {
+    color: #00b2b2
+}
+
+.string-param {
+    color: #ffc800
+}
+
+.boolean-param {
+    color: #ff00ff
+}

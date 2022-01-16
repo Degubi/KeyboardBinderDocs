@@ -1,0 +1,5 @@
+node_modules/
+CommandDocsGenerator/.classpath
+CommandDocsGenerator/.project
+CommandDocsGenerator/.settings/
+CommandDocsGenerator/target/

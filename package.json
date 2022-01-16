@@ -1,0 +1,10 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "author": "",
+  "type": "module",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
