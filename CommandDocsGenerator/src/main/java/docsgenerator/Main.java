@@ -12,13 +12,13 @@ public final class Main {
 
     public static void main(String[] args) {
         Command.commandsPerNamespace.forEach((namespace, commands) -> {
-            var header = "<h1>" + namespace + "</h1><hr>";
+            var header = "<h1>" + namespace + "</h1><p>" + Descriptions.getNamespaceDescription(namespace) + "</p><hr>";
             var functions = commands.stream()
                                     .sorted(Comparator.comparing(k -> k.function))
                                     .map(k -> "<h2>" + k.function + '(' + k.editorSignature + ")</h2>" + getCommandDescription(k))
                                     .collect(Collectors.joining("<hr>"));
             try {
-                Files.writeString(Path.of("../commands/" + namespace + ".html"), header + functions, CREATE, TRUNCATE_EXISTING);
+                Files.writeString(Path.of("../docs/pages/commands/" + namespace + ".html"), header + functions, CREATE, TRUNCATE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
             }
