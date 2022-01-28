@@ -57,6 +57,8 @@ public final class Main {
 
             case CG_CREATECLIP                      -> new String[] { createStringParam("channel", "wearethevr") };
             case CG_WRITELINE                       -> new String[] { createStringParam("text", "Hello World") };
+
+            case TWITCH_CREATE_CLIP                 -> new String[] { createStringParam("channel", "shroud") };
         };
 
         return command.namespace + '.' + command.function + '(' + String.join(", ", parameters) + ')';

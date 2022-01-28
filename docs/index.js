@@ -1,17 +1,28 @@
 const contentElement = document.getElementById('content');
+let currentPage = new URLSearchParams(window.location.search).get('page') ?? 'about';
+
+window.history.replaceState(currentPage, null, `?page=${currentPage}`);
+forceShowPage(currentPage);
+
+window.addEventListener('popstate', e => {
+    currentPage = e.state;
+    forceShowPage(e.state);
+});
+
+function forceShowPage(pagePath) {
+    fetch(`pages/${pagePath}.html`).then(k => k.text()).then(k => contentElement.innerHTML = k);
+}
 
 function showPage(pagePath) {
-    fetch(pagePath).then(k => k.text()).then(k => contentElement.innerHTML = k);
+    if(pagePath !== currentPage) {
+        currentPage = pagePath;
+        window.history.pushState(currentPage, null, `?page=${pagePath}`);
+        forceShowPage(pagePath);
+    }
 }
 
 
-window.onDropdownButtonClick = function(button) {
-    const dropdownStyle = button.nextElementSibling.style;
-
-    dropdownStyle.display = dropdownStyle.display === 'block' ? 'none' : 'block';
-};
-
-window.showNamespaceDocs = namespace => showPage(`pages/commands/${namespace}.html`);
-window.showDocs = page => showPage(`pages/${page}.html`);
-
-showPage('pages/about.html');
+// @ts-ignore
+window.toggleDropdownButton = k => k.nextElementSibling.style.display = k.nextElementSibling.style.display === 'block' ? 'none' : 'block';
+// @ts-ignore
+window.showPage = showPage;
