@@ -56,6 +56,7 @@ public final class Main {
             case OBS_TOGGLE_SOURCE_MUTED            -> new String[] { createStringParam("source", "outro-music") };
 
             case TWITCH_CREATE_CLIP                 -> new String[] { createStringParam("channel", "shroud") };
+            case TWITCH_CREATE_DOWNLOAD_CLIP        -> new String[] { createStringParam("channel", "shroud") };
         };
 
         return command.namespace + '.' + command.function + '(' + String.join(", ", parameters) + ')';
