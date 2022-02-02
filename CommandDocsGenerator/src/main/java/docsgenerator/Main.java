@@ -55,9 +55,6 @@ public final class Main {
             case OBS_TOGGLE_MEDIA_SOURCE_PAUSE      -> new String[] { createStringParam("source", "intro") };
             case OBS_TOGGLE_SOURCE_MUTED            -> new String[] { createStringParam("source", "outro-music") };
 
-            case CG_CREATECLIP                      -> new String[] { createStringParam("channel", "wearethevr") };
-            case CG_WRITELINE                       -> new String[] { createStringParam("text", "Hello World") };
-
             case TWITCH_CREATE_CLIP                 -> new String[] { createStringParam("channel", "shroud") };
         };
 
