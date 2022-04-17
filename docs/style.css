@@ -4,6 +4,7 @@ body {
     --boolean-literal-color: #3f9cd6;
     --module-name-color : #3ac990;
     --function-name-color: #dcdc9d;
+    --constant-literal-color: #44c1f1;
 
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;

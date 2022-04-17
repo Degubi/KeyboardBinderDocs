@@ -31,24 +31,31 @@ def get_example_arg_mappings(function_name: str, module_name: str):
 
     return {}
 
-def get_example_arg_key_value(arg_name: str, example_arg_value_mappings: dict[str, Any]):
+def get_optional_named_parameter_value(value: Any, module_name: str, constant_value_to_names: dict[Any, str]):
+    optional_constant_name = constant_value_to_names.get(value, None)
+
+    return f'{module_name}.{optional_constant_name}' if not optional_constant_name == None else str(value)
+
+def get_example_arg_key_value(arg_name: str, module_name: str, example_arg_value_mappings: dict[str, Any], constant_value_to_names: dict[Any, str]):
     arg_value = example_arg_value_mappings.get(arg_name, 'MISSING_ARG_VALUE')
     arg_value_type = type(arg_value)
-    is_lambda_type = arg_value_type == str and arg_value.startswith('lambda')
     value_color_css_var = 'number-literal' if arg_value_type in [ int, float ] else   \
                           'boolean-literal' if arg_value_type == bool else  \
                           'string-literal'
 
-    formatted_arg_value = f"'{arg_value}'" if arg_value_type == str and not is_lambda_type else arg_value
+    is_lambda_type = arg_value_type == str and arg_value.startswith('lambda')
+    formatted_arg_value = f"'{arg_value}'" if arg_value_type == str and not is_lambda_type else get_optional_named_parameter_value(arg_value, module_name, constant_value_to_names)
+    is_named_constant = formatted_arg_value.startswith(module_name) and not is_lambda_type
 
-    return f'{arg_name} = <span style = "color: var(--{value_color_css_var}-color)">{formatted_arg_value}</span>' if not is_lambda_type else \
+    return f'{arg_name} = <span style = "color: var(--module-name-color)">{module_name}</span>.<span style = "color: var(--constant-literal-color)">{formatted_arg_value[formatted_arg_value.index(".") + 1 : ]}</span>' if is_named_constant else \
+           f'{arg_name} = <span style = "color: var(--{value_color_css_var}-color)">{formatted_arg_value}</span>' if not is_lambda_type else \
            f'{arg_name} = ' + formatted_arg_value.replace('lambda', '<span style = "color: var(--boolean-literal-color)">lambda</span>')
 
-def get_function_call_example(function: ast.FunctionDef, module_name: str):
+def get_function_call_example(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
     function_name = function.name
     return_value_mappings = get_example_return_value_mappings(function_name, module_name)
     arg_value_mappings = get_example_arg_mappings(function_name, module_name)
-    args_list = (get_example_arg_key_value(k.arg, arg_value_mappings) for k in function.args.args)
+    args_list = (get_example_arg_key_value(k.arg, module_name, arg_value_mappings, constant_value_to_names) for k in function.args.args)
 
     return f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
            f'<span style = "color: var(--module-name-color)">{module_name}</span>.' + \
@@ -74,7 +81,8 @@ def get_function_return_type(function: ast.FunctionDef):
     else:
         return 'UNKNOWN_RETURN_TYPE'
 
-def get_function_arg_description(arg: ast.arg):
+
+def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_to_names: dict[Any, str]):
     arg_name = arg.arg
     arg_annotation = arg.annotation
 
@@ -84,7 +92,7 @@ def get_function_arg_description(arg: ast.arg):
         arg_type_params = arg_annotation.slice
 
         if isinstance(arg_type_params, ast.Constant):
-            return f'{arg_name}: {arg_type_params.value}'
+            return f'{arg_name}: {get_optional_named_parameter_value(arg_type_params.value, module_name, constant_value_to_names)}'
         elif isinstance(arg_type_params, ast.Tuple):
             type_params = arg_type_params.elts
 
@@ -96,23 +104,23 @@ def get_function_arg_description(arg: ast.arg):
             else:
                 union_values: list[ast.Constant] = type_params  # type: ignore
 
-                return f'{arg_name}: {" | ".join(str(k.value) for k in union_values)}'
+                return f'{arg_name}: {" | ".join(get_optional_named_parameter_value(k.value, module_name, constant_value_to_names) for k in union_values)}'
         else:
             return 'UNKNOWN_COMPLEX_ARG_TYPE'
     else:
         return 'UNKNOWN_ARG_TYPE'
 
 
-def get_function_description(function: ast.FunctionDef, module_name: str):
-    return f'<h2>{function.name}({", ".join(get_function_arg_description(k) for k in function.args.args)}) -> {get_function_return_type(function)}</h2>' + \
+def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
+    return f'<h2>{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h2>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
-           f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name)}</p>'
+           f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
-def get_constant_description(constant: ast.Assign):
+def get_constant_info(constant: ast.Assign):
     constant_name: ast.Name = constant.targets[0]  # type: ignore
     constant_value: ast.Constant = constant.value  # type: ignore
 
-    return f'<h2>{constant_name.id} = {constant_value.value}</h2>'
+    return (constant_value.value, str(constant_name.id))
 
 
 MODULES_DIR = '../KeyboardBinder/modules/keyboardBinder'
@@ -129,8 +137,10 @@ for module_file in MODULE_FILES:
         function_defs = [ k for k in module_child_nodes if isinstance(k, ast.FunctionDef) ]
         function_defs.sort(key = lambda k: k.name)
 
-        header = f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>'
-        function_descriptions = ( get_function_description(k, module_name) for k in function_defs )
-        constant_descriptions = [ get_constant_description(k) for k in constant_defs if not k.targets[0].id.startswith('__') ]  # type: ignore
+        constant_value_to_names = dict(get_constant_info(k) for k in constant_defs if not k.targets[0].id.startswith('__'))  # type: ignore
 
-        output_file.write(header + '<hr>'.join(constant_descriptions) + ('<br>' if len(constant_descriptions) > 0 else '') + '<hr>'.join(function_descriptions))
+        header = f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>'
+        function_descriptions = ( get_function_description(k, module_name, constant_value_to_names) for k in function_defs )
+        constant_descriptions = ( f'<h2>{k[1]} = {k[0]}</h2>' for k in constant_value_to_names.items() )
+
+        output_file.write(header + '<hr>'.join(constant_descriptions) + ('<br>' if len(constant_value_to_names) > 0 else '') + '<hr>'.join(function_descriptions))
