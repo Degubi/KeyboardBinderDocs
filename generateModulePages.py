@@ -3,33 +3,26 @@ from os import listdir
 from typing import Any
 
 def get_example_return_value_mappings(function_name: str, module_name: str):
-    if module_name == 'Mouse':
-        return [ 'x', 'y' ] if function_name == 'get_cursor_location' else []
-
-    return []
+    match(module_name, function_name):
+        case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
+        case _: return []
 
 def get_example_arg_mappings(function_name: str, module_name: str):
-    if module_name == 'Common':
-        return { 'text': 'epic text' } if function_name == 'copy_text_to_clipboard' else \
-               { 'command': 'explorer https://google.com' } if function_name == 'exec_command' else \
-               { 'seconds': 3.5 } if function_name == 'wait' else {}
-    elif module_name == 'Keyboard':
-        return { 'modifier_key': 16 } if function_name in [ 'hold_modifier_key', 'release_modifier_key' ] else \
-               { 'text': 'hi team' } if function_name == 'type' else {}
-    elif module_name == 'Mouse':
-        return { 'button': 1024 } if function_name == 'click' else \
-               { 'x': 50, 'y': 50 } if function_name == 'move_cursor_to' else {}
-    elif module_name == 'OBS':
-        return { 'source_name': 'background-music' } if function_name in [ 'restart_media_source', 'stop_media_source', 'toggle_media_source_pause', 'toggle_source_mute' ] else \
-               { 'source_name': 'outro-music', 'paused': True } if function_name == 'set_media_source_paused' else \
-               { 'source_name': 'epic-frag-song', 'muted': False } if function_name == 'set_source_muted' else \
-               { 'listener': "lambda: print('OBS exit!')" } if function_name == 'add_on_exit_listener' else {}
-    elif module_name == 'PremierePro':
-        return { 'level': 5 } if function_name == 'adjust_gain_level_by' else {}
-    elif module_name == 'Twitch':
-        return { 'channel_name': 'shroud' } if function_name == 'create_clip' else {}
-
-    return {}
+    match(module_name, function_name):
+        case ('Common', 'copy_text_to_clipboard'): return { 'text': 'epic text' }
+        case ('Common', 'exec_command'): return { 'command': 'explorer https://google.com' }
+        case ('Common', 'wait'): return { 'seconds': 3.5 }
+        case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key'): return { 'modifier_key': 16 }
+        case ('Keyboard', 'type'): return { 'text': 'hi team' }
+        case ('Mouse', 'click'): return { 'button': 1024 }
+        case ('Mouse', 'move_cursor_to'): return { 'x': 50, 'y': 50 }
+        case ('OBS', 'restart_media_source' | 'stop_media_source' | 'toggle_media_source_pause' | 'toggle_source_mute'): return { 'source_name': 'background-music' }
+        case ('OBS', 'set_media_source_paused'): return { 'source_name': 'outro-music', 'paused': True }
+        case ('OBS', 'set_source_muted'): return { 'source_name': 'epic-frag-song', 'muted': False }
+        case ('OBS', 'add_on_exit_listener'): return { 'listener': "lambda: print('OBS exit!')" }
+        case ('PremierePro', 'adjust_gain_level_by'): return { 'level': 5 }
+        case ('Twitch', 'create_clip'): return { 'channel_name': 'shroud' }
+        case _: return {}
 
 def get_optional_named_parameter_value(value: Any, module_name: str, constant_value_to_names: dict[Any, str]):
     optional_constant_name = constant_value_to_names.get(value, None)
@@ -63,39 +56,21 @@ def get_function_call_example(function: ast.FunctionDef, module_name: str, const
            f'({", ".join(args_list)})'
 
 def get_function_return_type(function: ast.FunctionDef):
-    function_return = function.returns
-
-    if function_return == None:
-        return 'MISSING_RETURN_TYPE'
-    elif isinstance(function_return, ast.Constant):
-        return function_return.value
-    elif isinstance(function_return, ast.Subscript):
-        return_type_name = function_return.value.id # type: ignore
-
-        if return_type_name == '__Tuple':
-            tuple_elements: list[ast.Name] = function_return.slice.elts  # type: ignore
-
-            return f'({", ".join(k.id for k in tuple_elements)})'
-        else:
-            return 'UNKNOWN_COMPLEX_RETURN_TYPE'
-    else:
-        return 'UNKNOWN_RETURN_TYPE'
+    match function.returns:
+        case None: return 'MISSING_RETURN_TYPE'
+        case ast.Constant(value): return str(value)
+        case ast.Subscript(ast.Name('__Tuple'), ast.Tuple(elements)): return f'({", ".join(k.id for k in elements)})' # type: ignore
+        case ast.Subscript((ast.Name(_))): return 'UNKNOWN_COMPLEX_RETURN_TYPE'
+        case _: return 'UNKNOWN_RETURN_TYPE'
 
 
 def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_to_names: dict[Any, str]):
     arg_name = arg.arg
-    arg_annotation = arg.annotation
 
-    if isinstance(arg_annotation, ast.Name):
-        return f'{arg_name}: {arg_annotation.id}'
-    elif isinstance(arg_annotation, ast.Subscript):
-        arg_type_params = arg_annotation.slice
-
-        if isinstance(arg_type_params, ast.Constant):
-            return f'{arg_name}: {get_optional_named_parameter_value(arg_type_params.value, module_name, constant_value_to_names)}'
-        elif isinstance(arg_type_params, ast.Tuple):
-            type_params = arg_type_params.elts
-
+    match arg.annotation:
+        case ast.Name(id): return f'{arg_name}: {id}'
+        case ast.Subscript(_, ast.Constant(value)): return f'{arg_name}: {get_optional_named_parameter_value(value, module_name, constant_value_to_names)}'
+        case ast.Subscript(_, ast.Tuple(type_params)):
             if isinstance(type_params[0], ast.List):
                 function_arg_types: list[ast.Constant] = type_params[0].elts  # type: ignore
                 function_return_type: ast.Constant = type_params[1]  # type: ignore
@@ -105,10 +80,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
                 union_values: list[ast.Constant] = type_params  # type: ignore
 
                 return f'{arg_name}: {" | ".join(get_optional_named_parameter_value(k.value, module_name, constant_value_to_names) for k in union_values)}'
-        else:
-            return 'UNKNOWN_COMPLEX_ARG_TYPE'
-    else:
-        return 'UNKNOWN_ARG_TYPE'
+        case _: return 'UNKNOWN_ARG_TYPE'
 
 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
@@ -140,7 +112,7 @@ for module_file in MODULE_FILES:
         constant_value_to_names = dict(get_constant_info(k) for k in constant_defs if not k.targets[0].id.startswith('__'))  # type: ignore
 
         header = f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>'
-        function_descriptions = ( get_function_description(k, module_name, constant_value_to_names) for k in function_defs )
         constant_descriptions = ( f'<h2>{k[1]} = {k[0]}</h2>' for k in constant_value_to_names.items() )
+        function_descriptions = ( get_function_description(k, module_name, constant_value_to_names) for k in function_defs )
 
         output_file.write(header + '<hr>'.join(constant_descriptions) + ('<br>' if len(constant_value_to_names) > 0 else '') + '<hr>'.join(function_descriptions))
