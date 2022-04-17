@@ -2,6 +2,12 @@ import ast
 from os import listdir
 from typing import Any
 
+def get_example_return_value_mappings(function_name: str, module_name: str):
+    if module_name == 'Mouse':
+        return [ 'x', 'y' ] if function_name == 'get_cursor_location' else []
+
+    return []
+
 def get_example_arg_mappings(function_name: str, module_name: str):
     if module_name == 'Common':
         return { 'text': 'epic text' } if function_name == 'copy_text_to_clipboard' else \
@@ -22,29 +28,32 @@ def get_example_arg_mappings(function_name: str, module_name: str):
         return { 'level': 5 } if function_name == 'adjust_gain_level_by' else {}
     elif module_name == 'Twitch':
         return { 'channel_name': 'shroud' } if function_name == 'create_clip' else {}
-    else:
-        return {}
+
+    return {}
 
 def get_example_arg_key_value(arg_name: str, example_arg_value_mappings: dict[str, Any]):
     arg_value = example_arg_value_mappings.get(arg_name, 'MISSING_ARG_VALUE')
     arg_value_type = type(arg_value)
     is_lambda_type = arg_value_type == str and arg_value.startswith('lambda')
-    value_css_class = 'integer-param' if arg_value_type in [ int, float ] else   \
-                      'enum-param' if arg_value_type == list else     \
-                      'boolean-param' if arg_value_type == bool else  \
-                      'enum-param' if is_lambda_type else \
-                      'string-param'
+    value_color_css_var = 'number-literal' if arg_value_type in [ int, float ] else   \
+                          'boolean-literal' if arg_value_type == bool else  \
+                          'string-literal'
 
     formatted_arg_value = f"'{arg_value}'" if arg_value_type == str and not is_lambda_type else arg_value
 
-    return f'{arg_name} = <span class = "{value_css_class}">{formatted_arg_value}</span>'
+    return f'{arg_name} = <span style = "color: var(--{value_color_css_var}-color)">{formatted_arg_value}</span>' if not is_lambda_type else \
+           f'{arg_name} = ' + formatted_arg_value.replace('lambda', '<span style = "color: var(--boolean-literal-color)">lambda</span>')
 
 def get_function_call_example(function: ast.FunctionDef, module_name: str):
     function_name = function.name
-    example_arg_value_mappings = get_example_arg_mappings(function_name, module_name)
-    example_args_list = ', '.join(get_example_arg_key_value(k.arg, example_arg_value_mappings) for k in function.args.args)
+    return_value_mappings = get_example_return_value_mappings(function_name, module_name)
+    arg_value_mappings = get_example_arg_mappings(function_name, module_name)
+    args_list = (get_example_arg_key_value(k.arg, arg_value_mappings) for k in function.args.args)
 
-    return f'{module_name}.{function_name}({example_args_list})'
+    return f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
+           f'<span style = "color: var(--module-name-color)">{module_name}</span>.' + \
+           f'<span style = "color: var(--function-name-color)">{function_name}</span>' + \
+           f'({", ".join(args_list)})'
 
 def get_function_return_type(function: ast.FunctionDef):
     function_return = function.returns
