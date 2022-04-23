@@ -1,10 +1,10 @@
 {
-  "name": "docs",
-  "version": "1.0.0",
-  "author": "",
-  "type": "module",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.17.2"
-  }
+    "name": "keyboardbinder-docs",
+    "version": "1.0.0",
+    "author": "Degubi",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "express": "4.17.3"
+    }
 }
