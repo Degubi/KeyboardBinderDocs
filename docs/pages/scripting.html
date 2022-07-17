@@ -1,0 +1,20 @@
+<h1>Scripting</h1>
+<p>
+    To create a script naviage to a profile's script folder.<br>
+    It is recommended to open this folder in an editor like VSCode for a better scripting experience.<br>
+    Bind scripts are written as python scripts. To create a script for e.g the 'A' key create a file named 'A.py'.<br>
+    Here's an example for a very boring, but simple script:
+</p>
+<p class = "code-example">
+    <span style="color: var(--keyword-color)">from</span>
+    <span style="color: var(--module-name-color)">keyboardBinder</span>
+    <span style="color: var(--keyword-color)">import</span>
+    <span style="color: var(--module-name-color)">Mouse</span><br><br>
+
+    <span style="color: var(--function-name-color)">print</span>(<span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">move_cursor_to</span>(x = <span style="color: var(--number-literal-color)">50</span>, y = <span style="color: var(--number-literal-color)">50</span>))
+</p>
+<p>
+    This simple code moves the cursor to the given location on the screen.<br>
+    To run this script activate the profile with the profile's activation button on the selected keyboard and press the 'A' key.<br>
+    For all the supported functions check the 'Modules' section.
+</p>

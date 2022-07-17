@@ -58,9 +58,8 @@ def get_function_call_example(function: ast.FunctionDef, module_name: str, const
 def get_function_return_type(function: ast.FunctionDef):
     match function.returns:
         case None: return 'MISSING_RETURN_TYPE'
-        case ast.Constant(value): return str(value)
-        case ast.Subscript(ast.Name('__Tuple'), ast.Tuple(elements)): return f'({", ".join(k.id for k in elements)})' # type: ignore
-        case ast.Subscript((ast.Name(_))): return 'UNKNOWN_COMPLEX_RETURN_TYPE'
+        case ast.Constant(value): return value
+        case ast.Name(value): return value
         case _: return 'UNKNOWN_RETURN_TYPE'
 
 
@@ -95,7 +94,7 @@ def get_constant_info(constant: ast.Assign):
     return (constant_value.value, str(constant_name.id))
 
 
-MODULES_DIR = '../KeyboardBinder/modules/keyboardBinder'
+MODULES_DIR = '../KeyboardBinder/app/modules/keyboardBinder'
 MODULE_FILES = (k for k in listdir(MODULES_DIR) if not k.startswith('_'))
 
 for module_file in MODULE_FILES:
