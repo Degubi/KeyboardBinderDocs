@@ -83,7 +83,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
 
 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
-    return f'<h2>{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h2>' + \
+    return f'<h2 id = "{function.name}" style = "cursor: pointer" onclick = "onAnchorClick(\'{function.name}\')" >{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h2>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
            f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
