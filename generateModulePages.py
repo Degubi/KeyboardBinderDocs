@@ -15,6 +15,8 @@ def get_example_arg_mappings(function_name: str, module_name: str):
         case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key'): return { 'modifier_key': 16 }
         case ('Keyboard', 'type'): return { 'text': 'hi team' }
         case ('Mouse', 'click'): return { 'button': 1024 }
+        case ('Mouse', 'hold'): return { 'button': 4096 }
+        case ('Mouse', 'release'): return { 'button': 4096 }
         case ('Mouse', 'move_cursor_to'): return { 'x': 50, 'y': 50 }
         case ('OBS', 'restart_media_source' | 'stop_media_source' | 'toggle_media_source_pause' | 'toggle_source_mute'): return { 'source_name': 'background-music' }
         case ('OBS', 'set_media_source_paused'): return { 'source_name': 'outro-music', 'paused': True }
@@ -83,7 +85,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
 
 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
-    return f'<h2 id = "{function.name}" style = "cursor: pointer" onclick = "onAnchorClick(\'{function.name}\')" >{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h2>' + \
+    return f'<h3 id = "{function.name}" style = "cursor: pointer" onclick = "onAnchorClick(\'{function.name}\')" >{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
            f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
@@ -110,8 +112,11 @@ for module_file in MODULE_FILES:
 
         constant_value_to_names = dict(get_constant_info(k) for k in constant_defs if not k.targets[0].id.startswith('__'))  # type: ignore
 
-        header = f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>'
-        constant_descriptions = ( f'<h2>{k[1]} = {k[0]}</h2>' for k in constant_value_to_names.items() )
-        function_descriptions = ( get_function_description(k, module_name, constant_value_to_names) for k in function_defs )
+        module_name_header = f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>'
+        constant_descriptions = [ f'<h3>{k[1]} = {k[0]}</h3>' for k in constant_value_to_names.items() ]
+        constants_header = '<h2>Constants</h2><hr>' if len(constant_descriptions) > 0 else ''
+        function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs ]
+        functions_header = '<h2>Functions</h2><hr>' if len(function_descriptions) > 0 else ''
 
-        output_file.write(header + '<hr>'.join(constant_descriptions) + ('<br>' if len(constant_value_to_names) > 0 else '') + '<hr>'.join(function_descriptions))
+        output_file.write(module_name_header + constants_header + '<hr>'.join(constant_descriptions) + ('<br>' if len(constant_descriptions) > 0 else '') +
+                          functions_header + '<hr>'.join(function_descriptions))
