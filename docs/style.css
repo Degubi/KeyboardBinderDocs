@@ -8,7 +8,7 @@ body {
     --constant-literal-color: #44c1f1;
 
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial;
     display: flex;
     height: 100vh;
 }

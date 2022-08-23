@@ -1,4 +1,5 @@
 import ast
+from itertools import groupby
 from os import listdir
 from typing import Any, Callable
 
@@ -18,12 +19,18 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Mouse', 'hold', _): return { 'button': 4096 }
         case ('Mouse', 'release', _): return { 'button': 4096 }
         case ('Mouse', 'move_cursor_to', _): return { 'x': 50, 'y': 50 }
-        case ('OBS', 'add_event_listener', 'OBS.EVENT_OBS_EXIT'): return { 'event': 'OBS.EVENT_OBS_EXIT', 'on_exit': 'lambda: print(\'We closin\')' }
-        case ('OBS', 'set_media_input_state', _): return { 'media_input_name': 'outro-music', 'state': 'OBS.MEDIA_PLAY' }
+        case ('OBS', 'add_event_listener', 'OBS.EVENT_OBS_EXIT'): return { 'event': 'OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY', 'on_exit': 'lambda: print(\'We closin\')' }
+        case ('OBS', 'set_media_input_state', _): return { 'media_input_name': 'outro-music', 'state': 'OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY' }
         case ('OBS', 'set_input_is_muted', _): return { 'input_name': 'epic-frag-song', 'muted': False }
         case ('PremierePro', 'adjust_gain_level_by', _): return { 'level': 5 }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
         case _: return {}
+
+def get_constant_info(constant: ast.Assign):
+    constant_name: ast.Name = constant.targets[0]  # type: ignore
+    constant_value: ast.Constant = constant.value  # type: ignore
+
+    return (constant_value.value, str(constant_name.id))
 
 def get_optional_named_parameter_value(value: Any, module_name: str, constant_value_to_names: dict[Any, str]):
     optional_constant_name = constant_value_to_names.get(value, None)
@@ -39,9 +46,9 @@ def get_example_arg_key_value(arg_name: str, module_name: str, example_arg_value
 
     is_lambda_type = arg_value_type == str and arg_value.startswith('lambda')
     formatted_arg_value = f"'{arg_value}'" if arg_value_type == str and not is_lambda_type else get_optional_named_parameter_value(arg_value, module_name, constant_value_to_names)
-    is_named_constant = formatted_arg_value.startswith(module_name) and not is_lambda_type
+    is_named_constant = arg_value in constant_value_to_names
 
-    return f'{arg_name} = <span style = "color: var(--module-name-color)">{module_name}</span>.<span style = "color: var(--constant-literal-color)">{formatted_arg_value[formatted_arg_value.index(".") + 1 : ]}</span>' if is_named_constant else \
+    return f'{arg_name} = <span style = "color: var(--module-name-color)">{module_name}</span>.<span style = "color: var(--constant-literal-color)">{constant_value_to_names[arg_value]}</span>' if is_named_constant else \
            f'{arg_name} = <span style = "color: var(--{value_color_css_var}-color)">{formatted_arg_value}</span>' if not is_lambda_type else \
            f'{arg_name} = ' + formatted_arg_value.replace('lambda', '<span style = "color: var(--boolean-literal-color)">lambda</span>')
 
@@ -62,7 +69,6 @@ def get_function_return_type(function: ast.FunctionDef):
         case ast.Constant(value): return value
         case ast.Name(value): return value
         case _: return 'UNKNOWN_RETURN_TYPE'
-
 
 def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_to_names: dict[Any, str]):
     arg_name = arg.arg
@@ -88,12 +94,6 @@ def get_function_description(function: ast.FunctionDef, module_name: str, consta
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
            f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
-def get_constant_info(constant: ast.Assign):
-    constant_name: ast.Name = constant.targets[0]  # type: ignore
-    constant_value: ast.Constant = constant.value  # type: ignore
-
-    return (constant_value.value, str(constant_name.id))
-
 
 MODULES_DIR = '../KeyboardBinder/app/modules/keyboardBinder'
 MODULE_FILES = (k for k in listdir(MODULES_DIR) if not k.startswith('_'))
@@ -110,13 +110,17 @@ for module_file in MODULE_FILES:
         function_defs.sort(key = lambda k: k.name)
 
         constant_value_to_names = dict(get_constant_info(k) for k in constant_defs if not k.targets[0].id.startswith('__'))  # type: ignore
+        constant_names = list(constant_value_to_names.values())
+        constant_names.sort()
+        constant_groups = dict((k, list(v)) for k, v in groupby(constant_names, key = lambda k: k[0 : k.index('_')]))
         is_overload_function_filter: Callable[[ ast.FunctionDef ], bool ] = lambda fn: not any(k for k in function_defs if k != fn and k.name == fn.name and len(k.decorator_list) > 0)
 
-        module_name_header = f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>'
-        constant_descriptions = [ f'<h3>{k[1]}</h3>' for k in constant_value_to_names.items() ]
-        constants_header = '<h2>Constants</h2><hr>' if len(constant_descriptions) > 0 else ''
+        constant_group_descriptions = [ f'<h3>{" | ".join(group_items)}</h3>' for _, group_items in constant_groups.items() ]
         function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs if is_overload_function_filter(k) ]
-        functions_header = '<h2>Functions</h2><hr>' if len(function_descriptions) > 0 else ''
 
-        output_file.write(module_name_header + constants_header + '<hr>'.join(constant_descriptions) + ('<br>' if len(constant_descriptions) > 0 else '') +
-                          functions_header + '<hr>'.join(function_descriptions))
+        output_file.write(f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>' +
+                         ('<h2>Constants</h2><hr>' if len(constant_group_descriptions) > 0 else '') +
+                         '<hr>'.join(constant_group_descriptions) +
+                         ('<br>' if len(constant_group_descriptions) > 0 else '') +
+                         ('<h2>Functions</h2><hr>' if len(function_descriptions) > 0 else '') +
+                         '<hr>'.join(function_descriptions))
