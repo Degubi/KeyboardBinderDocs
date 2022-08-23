@@ -1,29 +1,28 @@
 import ast
 from os import listdir
-from typing import Any
+from typing import Any, Callable
 
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
         case _: return []
 
-def get_example_arg_mappings(function_name: str, module_name: str):
-    match(module_name, function_name):
-        case ('Common', 'copy_text_to_clipboard'): return { 'text': 'epic text' }
-        case ('Common', 'exec_command'): return { 'command': 'explorer https://google.com' }
-        case ('Common', 'wait'): return { 'seconds': 3.5 }
-        case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key'): return { 'modifier_key': 16 }
-        case ('Keyboard', 'type'): return { 'text': 'hi team' }
-        case ('Mouse', 'click'): return { 'button': 1024 }
-        case ('Mouse', 'hold'): return { 'button': 4096 }
-        case ('Mouse', 'release'): return { 'button': 4096 }
-        case ('Mouse', 'move_cursor_to'): return { 'x': 50, 'y': 50 }
-        case ('OBS', 'restart_media_source' | 'stop_media_source' | 'toggle_media_source_pause' | 'toggle_source_mute'): return { 'source_name': 'background-music' }
-        case ('OBS', 'set_media_source_paused'): return { 'source_name': 'outro-music', 'paused': True }
-        case ('OBS', 'set_source_muted'): return { 'source_name': 'epic-frag-song', 'muted': False }
-        case ('OBS', 'add_on_exit_listener'): return { 'listener': "lambda: print('OBS exit!')" }
-        case ('PremierePro', 'adjust_gain_level_by'): return { 'level': 5 }
-        case ('Twitch', 'create_clip'): return { 'channel_name': 'shroud' }
+def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
+    match(module_name, function_name, overload_name):
+        case ('Common', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
+        case ('Common', 'exec_command', _): return { 'command': 'explorer https://google.com' }
+        case ('Common', 'wait', _): return { 'seconds': 3.5 }
+        case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key', _): return { 'modifier_key': 16 }
+        case ('Keyboard', 'type', _): return { 'text': 'hi team' }
+        case ('Mouse', 'click', _): return { 'button': 1024 }
+        case ('Mouse', 'hold', _): return { 'button': 4096 }
+        case ('Mouse', 'release', _): return { 'button': 4096 }
+        case ('Mouse', 'move_cursor_to', _): return { 'x': 50, 'y': 50 }
+        case ('OBS', 'add_event_listener', 'OBS.EVENT_OBS_EXIT'): return { 'event': 'OBS.EVENT_OBS_EXIT', 'on_exit': 'lambda: print(\'We closin\')' }
+        case ('OBS', 'set_media_input_state', _): return { 'media_input_name': 'outro-music', 'state': 'OBS.MEDIA_PLAY' }
+        case ('OBS', 'set_input_is_muted', _): return { 'input_name': 'epic-frag-song', 'muted': False }
+        case ('PremierePro', 'adjust_gain_level_by', _): return { 'level': 5 }
+        case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
         case _: return {}
 
 def get_optional_named_parameter_value(value: Any, module_name: str, constant_value_to_names: dict[Any, str]):
@@ -49,7 +48,7 @@ def get_example_arg_key_value(arg_name: str, module_name: str, example_arg_value
 def get_function_call_example(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
     function_name = function.name
     return_value_mappings = get_example_return_value_mappings(function_name, module_name)
-    arg_value_mappings = get_example_arg_mappings(function_name, module_name)
+    arg_value_mappings = get_example_arg_mappings(function_name, module_name, 'OBS.EVENT_OBS_EXIT')  # TODO: Make this not hardcoded
     args_list = (get_example_arg_key_value(k.arg, module_name, arg_value_mappings, constant_value_to_names) for k in function.args.args)
 
     return f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
@@ -100,7 +99,7 @@ MODULES_DIR = '../KeyboardBinder/app/modules/keyboardBinder'
 MODULE_FILES = (k for k in listdir(MODULES_DIR) if not k.startswith('_'))
 
 for module_file in MODULE_FILES:
-    module_name = module_file[0 : module_file.rindex(".")]
+    module_name = module_file[0 : module_file.rindex('.')]
 
     with open(f'{MODULES_DIR}/{module_file}', 'r') as input_file, open(f'docs/pages/modules/{module_name.lower()}.html', 'w') as output_file:
         module_node = ast.parse(input_file.read())
@@ -111,11 +110,12 @@ for module_file in MODULE_FILES:
         function_defs.sort(key = lambda k: k.name)
 
         constant_value_to_names = dict(get_constant_info(k) for k in constant_defs if not k.targets[0].id.startswith('__'))  # type: ignore
+        is_overload_function_filter: Callable[[ ast.FunctionDef ], bool ] = lambda fn: not any(k for k in function_defs if k != fn and k.name == fn.name and len(k.decorator_list) > 0)
 
         module_name_header = f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>'
-        constant_descriptions = [ f'<h3>{k[1]} = {k[0]}</h3>' for k in constant_value_to_names.items() ]
+        constant_descriptions = [ f'<h3>{k[1]}</h3>' for k in constant_value_to_names.items() ]
         constants_header = '<h2>Constants</h2><hr>' if len(constant_descriptions) > 0 else ''
-        function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs ]
+        function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs if is_overload_function_filter(k) ]
         functions_header = '<h2>Functions</h2><hr>' if len(function_descriptions) > 0 else ''
 
         output_file.write(module_name_header + constants_header + '<hr>'.join(constant_descriptions) + ('<br>' if len(constant_descriptions) > 0 else '') +
