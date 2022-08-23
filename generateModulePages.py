@@ -1,3 +1,4 @@
+import builtins
 import ast
 from itertools import groupby
 from os import listdir
@@ -40,28 +41,52 @@ def get_optional_named_parameter_value(value: Any, module_name: str, constant_va
 def get_example_arg_key_value(arg_name: str, module_name: str, example_arg_value_mappings: dict[str, Any], constant_value_to_names: dict[Any, str]):
     arg_value = example_arg_value_mappings.get(arg_name, 'MISSING_ARG_VALUE')
     arg_value_type = type(arg_value)
-    value_color_css_var = 'number-literal' if arg_value_type in [ int, float ] else   \
-                          'boolean-literal' if arg_value_type == bool else  \
-                          'string-literal'
 
     is_lambda_type = arg_value_type == str and arg_value.startswith('lambda')
     formatted_arg_value = f"'{arg_value}'" if arg_value_type == str and not is_lambda_type else get_optional_named_parameter_value(arg_value, module_name, constant_value_to_names)
     is_named_constant = arg_value in constant_value_to_names
 
-    return f'{arg_name} = <span style = "color: var(--module-name-color)">{module_name}</span>.<span style = "color: var(--constant-literal-color)">{constant_value_to_names[arg_value]}</span>' if is_named_constant else \
-           f'{arg_name} = <span style = "color: var(--{value_color_css_var}-color)">{formatted_arg_value}</span>' if not is_lambda_type else \
-           f'{arg_name} = ' + formatted_arg_value.replace('lambda', '<span style = "color: var(--boolean-literal-color)">lambda</span>')
+    return f'{arg_name} = {module_name}.{constant_value_to_names[arg_value]}' if is_named_constant else \
+           f'{arg_name} = {formatted_arg_value}' if not is_lambda_type else \
+           f'{arg_name} = ' + formatted_arg_value
+
+def syntax_highlight_python_function_call(code: str):
+    function_call_ast: ast.Call = ast.parse(code).body[0].value  # type: ignore
+    function_call_func: ast.Attribute = function_call_ast.func  # type: ignore
+    function_call_module: ast.Name = function_call_func.value  # type: ignore
+    function_call_args = function_call_ast.keywords
+    function_call_args.reverse()
+
+    for arg in function_call_args:
+        arg_value_ast = arg.value
+        before_part = code[0 : arg_value_ast.col_offset]
+        after_part = code[arg_value_ast.end_col_offset : ]
+
+        match arg_value_ast:
+            case ast.Constant(builtins.bool(value)):  code = f'{before_part}<span style = "color: var(--boolean-literal-color)">{value}</span>{after_part}'
+            case ast.Constant(builtins.str(value)):   code = f'{before_part}<span style = "color: var(--string-literal-color)">\'{value}\'</span>{after_part}'
+            case ast.Constant(builtins.int(value)):   code = f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
+            case ast.Constant(builtins.float(value)): code = f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
+            case ast.Attribute(ast.Name(module), constant): code = f'{before_part}<span style = "color: var(--module-name-color)">{module}</span>.' + \
+                                                                   f'<span style = "color: var(--constant-literal-color)">{constant}</span>{after_part}'
+            case ast.Lambda(_, body): code = f'{before_part}<span style = "color: var(--boolean-literal-color)">lambda</span>: {code[body.col_offset : ]}'
+
+    code = f'{code[0 : function_call_func.col_offset]}<span style = "color: var(--module-name-color)">{function_call_module.id}</span>.' + \
+           f'<span style = "color: var(--function-name-color)">{function_call_func.attr}</span>{code[function_call_func.end_col_offset : ]}'
+
+    return code
+
 
 def get_function_call_example(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
     function_name = function.name
     return_value_mappings = get_example_return_value_mappings(function_name, module_name)
     arg_value_mappings = get_example_arg_mappings(function_name, module_name, 'OBS.EVENT_OBS_EXIT')  # TODO: Make this not hardcoded
     args_list = (get_example_arg_key_value(k.arg, module_name, arg_value_mappings, constant_value_to_names) for k in function.args.args)
+    raw_text_example = f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
+                       f'{module_name}.{function_name}' + \
+                       f'({", ".join(args_list)})'
 
-    return f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
-           f'<span style = "color: var(--module-name-color)">{module_name}</span>.' + \
-           f'<span style = "color: var(--function-name-color)">{function_name}</span>' + \
-           f'({", ".join(args_list)})'
+    return syntax_highlight_python_function_call(raw_text_example)
 
 def get_function_return_type(function: ast.FunctionDef):
     match function.returns:
