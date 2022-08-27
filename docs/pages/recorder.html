@@ -1,0 +1,50 @@
+<h1>Interaction Recorder</h1>
+<p>
+    To ease the process of creating more complicated mouse/keyboard interaction based scripts it is recommended to use the Interaction recorder.<br>
+</p>
+<br>
+<h2>Starting</h2>
+<p>
+    The recording process is really simple: You start the recorder and you get some generated script source for mimicing the recorded interactions.<br>
+    To start the recording process select the 'Interaction Recorder' option from the application's tray icon menu.<br>
+    A small overlay box will open on the top left side of the screen.
+</p>
+<br>
+<img src = "assets/recorder/overlay_initial.png" style = "margin-right: 30px">
+<br>
+<h2>Usage</h2>
+<p>
+    Using the recorder is really easy:
+</p>
+<ul>
+    <li>To start recording middle click on the mouse</li>
+    <li>Every mouse click, mouse movement and keyboard interaction gets recorded along with the delay between interactions</li>
+    <li>To stop recording middle click on the mouse</li>
+    <li>After a successful recording a desktop notification will appear with some information</li>
+    <li>The generated script source gets copied to the clipboard. To use it paste it into a user script file.</li>
+</ul>
+<p>
+    While recording interactions the overlay screen logs the interactions.
+</p>
+<br>
+<img src = "assets/recorder/overlay_in_process.png" style = "margin-right: 30px">
+<h2>Example output</h2>
+<p>
+    It is worth mentioning that the generated script is usually not optimal. It is recommended to clean up before using it.
+</p>
+<br>
+<p class = "code-example">
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">move_cursor_to</span>(<span style="color: var(--number-literal-color)">712</span>, <span style="color: var(--number-literal-color)">233</span>)<br>
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">click</span>(<span style = "color: var(--module-name-color)">Mouse</span>.<span style = "color: var(--constant-literal-color)">BUTTON_LEFT</span>)<br>
+    <span style="color: var(--module-name-color)">Keyboard</span>.<span style="color: var(--function-name-color)">type</span>(<span style = "color: var(--string-literal-color)">'ASD'</span>)<br>
+    <span style="color: var(--module-name-color)">Common</span>.<span style="color: var(--function-name-color)">wait</span>(<span style="color: var(--number-literal-color)">2460</span>)<br>
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">move_cursor_to</span>(<span style="color: var(--number-literal-color)">712</span>, <span style="color: var(--number-literal-color)">233</span>)<br>
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">click</span>(<span style = "color: var(--module-name-color)">Mouse</span>.<span style = "color: var(--constant-literal-color)">BUTTON_LEFT</span>)<br>
+    <span style="color: var(--module-name-color)">Common</span>.<span style="color: var(--function-name-color)">wait</span>(<span style="color: var(--number-literal-color)">518</span>)<br>
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">move_cursor_to</span>(<span style="color: var(--number-literal-color)">1012</span>, <span style="color: var(--number-literal-color)">246</span>)<br>
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">click</span>(<span style = "color: var(--module-name-color)">Mouse</span>.<span style = "color: var(--constant-literal-color)">BUTTON_RIGHT</span>)<br>
+    <span style="color: var(--module-name-color)">Common</span>.<span style="color: var(--function-name-color)">wait</span>(<span style="color: var(--number-literal-color)">912</span>)<br>
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">move_cursor_to</span>(<span style="color: var(--number-literal-color)">821</span>, <span style="color: var(--number-literal-color)">219</span>)<br>
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">click</span>(<span style = "color: var(--module-name-color)">Mouse</span>.<span style = "color: var(--constant-literal-color)">BUTTON_LEFT</span>)<br>
+    <span style="color: var(--module-name-color)">Keyboard</span>.<span style="color: var(--function-name-color)">type</span>(<span style = "color: var(--string-literal-color)">'VVVV'</span>)<br>
+</p>

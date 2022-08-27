@@ -1,9 +1,17 @@
-<h1>Scripting</h1>
+<h1>User Scripting</h1>
 <p>
-    To create a script naviage to a profile's script folder.<br>
-    It is recommended to open this folder in an editor like VSCode for a better scripting experience.<br>
-    Bind scripts are written as python scripts. To create a script for e.g the 'A' key create a file named 'A.py'.<br>
-    Here's an example for a very boring, but simple script:
+    To start scripting naviage to a profile's script folder. It is recommended use an editor like VSCode for a better scripting experience.
+</p>
+<br>
+<h2>Script structure</h2>
+<p>
+    Bind scripts are written as regular python scripts.<br>
+    There are a number of provided modules for interacting with the user's mouse/keyboard or other supported applications.
+</p>
+<h2>Simple example</h2>
+<p>
+    Let's start by creating a very simple script for e.g the 'A' key. To begin create a file named 'A.py'.<br>
+    Paste in the following code:
 </p>
 <p class = "code-example">
     <span style="color: var(--keyword-color)">from</span>
@@ -11,10 +19,18 @@
     <span style="color: var(--keyword-color)">import</span>
     <span style="color: var(--module-name-color)">Mouse</span><br><br>
 
-    <span style="color: var(--function-name-color)">print</span>(<span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">move_cursor_to</span>(x = <span style="color: var(--number-literal-color)">50</span>, y = <span style="color: var(--number-literal-color)">50</span>))
+    <span style="color: var(--module-name-color)">Mouse</span>.<span style="color: var(--function-name-color)">move_cursor_to</span>(x = <span style="color: var(--number-literal-color)">50</span>, y = <span style="color: var(--number-literal-color)">50</span>)
 </p>
 <p>
-    This simple code moves the cursor to the given location on the screen.<br>
-    To run this script activate the profile with the profile's activation button on the selected keyboard and press the 'A' key.<br>
-    For all the supported functions check the 'Modules' section.
+    The first line imports the Mouse module from the keyboardBinder's library. We use this module to interact with the user's mouse.<br>
+    The second line moves the cursor to the given location on the screen. (the top left corner of the screen is considered 0 0)<br>
+    For all the supported modules & functions check the 'Scripting Modules' section.
 </p>
+<h2>Running</h2>
+<p>
+    After configuration running a script is really easy:
+</p>
+<ul>
+    <li>Activate the profile with it's activation button on it's keyboard</li>
+    <li>Press the 'A' key on the profile's keyboard</li>
+</ul>

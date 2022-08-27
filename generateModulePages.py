@@ -115,7 +115,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
 
 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
-    return f'<h3 id = "{function.name}" style = "cursor: pointer" onclick = "onAnchorClick(\'{function.name}\')" >{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
+    return f'<h3 id = "{function.name}" style = "cursor: pointer" onclick = "onAnchorClick(\'{function.name}\')">{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
            f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
@@ -142,10 +142,18 @@ for module_file in MODULE_FILES:
 
         constant_group_descriptions = [ f'<h3>{" | ".join(group_items)}</h3>' for _, group_items in constant_groups.items() ]
         function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs if is_overload_function_filter(k) ]
+        module_import_text = '<p class = "code-example">' + \
+                               '<span style="color: var(--keyword-color)">from</span> ' + \
+                               '<span style="color: var(--module-name-color)">keyboardBinder</span> ' + \
+                               '<span style="color: var(--keyword-color)">import</span> ' + \
+                              f'<span style="color: var(--module-name-color)">{module_name}</span>' + \
+                             '</p>'
 
-        output_file.write(f'<h1>{module_name}</h1><p>{ast.get_docstring(module_node)}</p><br>' +
-                         ('<h2>Constants</h2><hr>' if len(constant_group_descriptions) > 0 else '') +
-                         '<hr>'.join(constant_group_descriptions) +
-                         ('<br>' if len(constant_group_descriptions) > 0 else '') +
-                         ('<h2>Functions</h2><hr>' if len(function_descriptions) > 0 else '') +
-                         '<hr>'.join(function_descriptions))
+        output_file.write(f'<h1>{module_name} module</h1>' +
+                          f'<p>{ast.get_docstring(module_node)}</p><br>' +
+                          '<h2>Importing</h2>' + module_import_text +
+                          ('<h2>Constants</h2><hr>' if len(constant_group_descriptions) > 0 else '') +
+                           '<hr>'.join(constant_group_descriptions) +
+                          ('<br>' if len(constant_group_descriptions) > 0 else '') +
+                          ('<h2>Functions</h2><hr>' if len(function_descriptions) > 0 else '') +
+                           '<hr>'.join(function_descriptions))
