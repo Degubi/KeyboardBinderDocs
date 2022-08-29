@@ -130,11 +130,11 @@ for module_file in MODULE_FILES:
         module_node = ast.parse(input_file.read())
         module_child_nodes = list(ast.iter_child_nodes(module_node))
 
-        constant_defs = ( k for k in module_child_nodes if isinstance(k, ast.Assign) )
-        function_defs = [ k for k in module_child_nodes if isinstance(k, ast.FunctionDef) ]
+        constant_defs = ( k for k in module_child_nodes if isinstance(k, ast.Assign) and not k.targets[0].id.startswith('__'))  # type: ignore
+        function_defs = [ k for k in module_child_nodes if isinstance(k, ast.FunctionDef) and not k.name.startswith('__') ]
         function_defs.sort(key = lambda k: k.name)
 
-        constant_value_to_names = dict(get_constant_info(k) for k in constant_defs if not k.targets[0].id.startswith('__'))  # type: ignore
+        constant_value_to_names = dict(get_constant_info(k) for k in constant_defs)
         constant_names = list(constant_value_to_names.values())
         constant_names.sort()
         constant_groups = dict((k, list(v)) for k, v in groupby(constant_names, key = lambda k: k[0 : k.index('_')]))
