@@ -1,5 +1,21 @@
 <h1>Remote Connections</h1>
 <p>
-    Some modules require that the application is connected to other applications or is logged into some services.
-    TODO
+    There are some modules that require that the application is connected to some other application or is logged into some service
 </p>
+<br>
+<h2>OBS</h2>
+<p>
+    OBS functionality is implemented through the OBS Websocket plugin. First make sure it is enabled in OBS settings.<br>
+    To enable it tick the 'Enable Websocket server' option. It is also recommended to 'Enable System Tray Alerts' so that you know if you can actually connect to it.
+</p>
+<img src = "assets/connections/obs_websocket.png" width = "600">
+<br><br>
+<p>
+    Next steps are to connect to OBS from the application:
+</p>
+<ul>
+    <li>Open up 'Connections' from the tray icon menu</li>
+    <li>Click on the 'Toggle OBS' option</li>
+    <li>If you enabled the 'Enable System Tray Alerts' in OBS settings a notification should pop up regarding a successful connection</li>
+    <li>After this point all functions that are found in the OBS module should work</li>
+</ul>
