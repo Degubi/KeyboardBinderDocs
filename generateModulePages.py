@@ -16,12 +16,20 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Common', 'wait', _): return { 'seconds': 3.5 }
         case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key', _): return { 'modifier_key': 16 }
         case ('Keyboard', 'type', _): return { 'text': 'hi team' }
+        case ('Keyboard', 'while_holding_modifier_key', _): return { 'modifier_key': 17, 'action': 'lambda: Keyboard.type(\'S\')' }
         case ('Mouse', 'click', _): return { 'button': 1024 }
         case ('Mouse', 'hold', _): return { 'button': 4096 }
-        case ('Mouse', 'release', _): return { 'button': 4096 }
         case ('Mouse', 'move_cursor_to', _): return { 'x': 50, 'y': 50 }
-        case ('OBS', 'add_event_listener', 'OBS.EVENT_OBS_EXIT'): return { 'event': 'OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY', 'on_exit': 'lambda: print(\'We closin\')' }
-        case ('OBS', 'set_media_input_state', _): return { 'media_input_name': 'outro-music', 'state': 'OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY' }
+        case ('Mouse', 'release', _): return { 'button': 4096 }
+        case ('OBS', 'add_event_listener', 'OBS.EVENT_OBS_EXIT'): return { 'event': 'ExitStarted', 'on_exit': 'lambda: print(\'We closin\')' }
+        case ('OBS', 'get_input_volume', _): return { 'input_name': 'intro-song' }
+        case ('OBS', 'get_is_input_muted', _): return { 'input_name': 'outro-song' }
+        case ('OBS', 'pause_media_input', _): return { 'media_input_name': 'outro-music' }
+        case ('OBS', 'play_media_input', _): return { 'media_input_name': 'outro-music' }
+        case ('OBS', 'restart_media_input', _): return { 'media_input_name': 'outro-music' }
+        case ('OBS', 'set_current_scene_transition', _): return { 'transition_name': 'epic-transition' }
+        case ('OBS', 'set_input_volume', _): return { 'input_name': 'intro-song', 'volume': 12 }
+        case ('OBS', 'stop_media_input', _): return { 'media_input_name': 'outro-music' }
         case ('OBS', 'set_input_is_muted', _): return { 'input_name': 'epic-frag-song', 'muted': False }
         case ('PremierePro', 'adjust_gain_level_by', _): return { 'level': 5 }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
@@ -38,9 +46,12 @@ def get_optional_named_parameter_value(value: Any, module_name: str, constant_va
 
     return f'{module_name}.{optional_constant_name}' if not optional_constant_name == None else str(value)
 
-def get_example_arg_key_value(arg_name: str, module_name: str, example_arg_value_mappings: dict[str, Any], constant_value_to_names: dict[Any, str]):
+def get_example_arg_key_value(arg_name: str, module_name: str, function_name: str, example_arg_value_mappings: dict[str, Any], constant_value_to_names: dict[Any, str]):
     arg_value = example_arg_value_mappings.get(arg_name, 'MISSING_ARG_VALUE')
     arg_value_type = type(arg_value)
+
+    if arg_value == 'MISSING_ARG_VALUE':
+        print(f'No example arg mapping found for {module_name}.{function_name}: \'{arg_name}\'')
 
     is_lambda_type = arg_value_type == str and arg_value.startswith('lambda')
     formatted_arg_value = f"'{arg_value}'" if arg_value_type == str and not is_lambda_type else get_optional_named_parameter_value(arg_value, module_name, constant_value_to_names)
@@ -81,7 +92,7 @@ def get_function_call_example(function: ast.FunctionDef, module_name: str, const
     function_name = function.name
     return_value_mappings = get_example_return_value_mappings(function_name, module_name)
     arg_value_mappings = get_example_arg_mappings(function_name, module_name, 'OBS.EVENT_OBS_EXIT')  # TODO: Make this not hardcoded
-    args_list = (get_example_arg_key_value(k.arg, module_name, arg_value_mappings, constant_value_to_names) for k in function.args.args)
+    args_list = (get_example_arg_key_value(k.arg, module_name, function_name, arg_value_mappings, constant_value_to_names) for k in function.args.args)
     raw_text_example = f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
                        f'{module_name}.{function_name}' + \
                        f'({", ".join(args_list)})'
@@ -115,7 +126,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
 
 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
-    return f'<h3 id = "{function.name}" style = "cursor: pointer" onclick = "onAnchorClick(\'{function.name}\')">{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
+    return f'<h3 id = "{function.name}">{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
            f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
