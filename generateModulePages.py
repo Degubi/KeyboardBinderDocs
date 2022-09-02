@@ -63,27 +63,43 @@ def get_example_arg_key_value(arg_name: str, module_name: str, function_name: st
 
 def syntax_highlight_python_function_call(code: str):
     function_call_ast: ast.Call = ast.parse(code).body[0].value  # type: ignore
-    function_call_func: ast.Attribute = function_call_ast.func  # type: ignore
-    function_call_module: ast.Name = function_call_func.value  # type: ignore
-    function_call_args = function_call_ast.keywords
-    function_call_args.reverse()
 
-    for arg in function_call_args:
-        arg_value_ast = arg.value
-        before_part = code[0 : arg_value_ast.col_offset]
-        after_part = code[arg_value_ast.end_col_offset : ]
+    def highlight_arg(code: str, arg: ast.expr):
+        before_part = code[0 : arg.col_offset]
+        after_part = code[arg.end_col_offset : ]
 
-        match arg_value_ast:
-            case ast.Constant(builtins.bool(value)):  code = f'{before_part}<span style = "color: var(--boolean-literal-color)">{value}</span>{after_part}'
-            case ast.Constant(builtins.str(value)):   code = f'{before_part}<span style = "color: var(--string-literal-color)">\'{value}\'</span>{after_part}'
-            case ast.Constant(builtins.int(value)):   code = f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
-            case ast.Constant(builtins.float(value)): code = f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
-            case ast.Attribute(ast.Name(module), constant): code = f'{before_part}<span style = "color: var(--module-name-color)">{module}</span>.' + \
+        match arg:
+            case ast.Constant(builtins.bool(value)):  return f'{before_part}<span style = "color: var(--boolean-literal-color)">{value}</span>{after_part}'
+            case ast.Constant(builtins.str(value)):   return f'{before_part}<span style = "color: var(--string-literal-color)">\'{value}\'</span>{after_part}'
+            case ast.Constant(builtins.int(value)):   return f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
+            case ast.Constant(builtins.float(value)): return f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
+            case ast.Attribute(ast.Name(module), constant): return f'{before_part}<span style = "color: var(--module-name-color)">{module}</span>.' + \
                                                                    f'<span style = "color: var(--constant-literal-color)">{constant}</span>{after_part}'
-            case ast.Lambda(_, body): code = f'{before_part}<span style = "color: var(--boolean-literal-color)">lambda</span>: {code[body.col_offset : ]}'
+            case ast.Lambda(_, body): return f'{before_part}<span style = "color: var(--boolean-literal-color)">lambda</span>: {syntax_highlight_python_function_call(code[body.col_offset : -1])})'
+            case _:
+                print(f'Unknown arg type found: {arg}')
+                return ''
 
-    code = f'{code[0 : function_call_func.col_offset]}<span style = "color: var(--module-name-color)">{function_call_module.id}</span>.' + \
-           f'<span style = "color: var(--function-name-color)">{function_call_func.attr}</span>{code[function_call_func.end_col_offset : ]}'
+    function_call_named_args = function_call_ast.keywords
+    function_call_named_args.reverse()
+    function_call_anonymus_args = function_call_ast.args
+    function_call_anonymus_args.reverse()
+
+    for arg in function_call_named_args:    code = highlight_arg(code, arg.value)
+    for arg in function_call_anonymus_args: code = highlight_arg(code, arg)
+
+    function_call_type = type(function_call_ast.func)
+
+    if function_call_type == ast.Attribute:
+        function_call_func_attr: ast.Attribute = function_call_ast.func  # type: ignore
+        function_call_module: ast.Name = function_call_func_attr.value  # type: ignore
+
+        code = f'{code[0 : function_call_func_attr.col_offset]}<span style = "color: var(--module-name-color)">{function_call_module.id}</span>.' + \
+               f'<span style = "color: var(--function-name-color)">{function_call_func_attr.attr}</span>{code[function_call_func_attr.end_col_offset : ]}'
+    elif function_call_type == ast.Name:
+        function_call_func: ast.Name = function_call_ast.func  # type: ignore
+
+        code = f'<span style = "color: var(--function-name-color)">{function_call_func.id}</span>{code[function_call_func.end_col_offset : ]}'
 
     return code
 
@@ -104,7 +120,10 @@ def get_function_return_type(function: ast.FunctionDef):
         case None: return 'MISSING_RETURN_TYPE'
         case ast.Constant(value): return value
         case ast.Name(value): return value
-        case _: return 'UNKNOWN_RETURN_TYPE'
+        case ast.Subscript(ast.Name(value), ast.Name(type_args)): return f'{value}[{type_args}]'
+        case _:
+            print(f'Unknown return type found: {function.returns}')
+            return 'UNKNOWN_RETURN_TYPE'
 
 def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_to_names: dict[Any, str]):
     arg_name = arg.arg
@@ -122,7 +141,9 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
                 union_values: list[ast.Constant] = type_params  # type: ignore
 
                 return f'{arg_name}: {" | ".join(get_optional_named_parameter_value(k.value, module_name, constant_value_to_names) for k in union_values)}'
-        case _: return 'UNKNOWN_ARG_TYPE'
+        case _:
+            print(f'Unknown arg type found: {arg.annotation}')
+            return 'UNKNOWN_ARG_TYPE'
 
 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
