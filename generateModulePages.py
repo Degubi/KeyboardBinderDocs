@@ -7,6 +7,11 @@ from typing import Any, Callable
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
+        case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
+        case ('Keyboard', 'is_alt_key_down' | 'is_ctrl_key_down' | 'is_shift_key_down'): return [ 'is_down' ]
+        case ('OBS', 'get_current_scene_name'): return [ 'scene_name' ]
+        case ('OBS', 'get_is_input_muted'): return [ 'is_muted' ]
+        case ('OBS', 'get_input_volume'): return [ 'volume' ]
         case _: return []
 
 def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
@@ -27,6 +32,7 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('OBS', 'pause_media_input', _): return { 'media_input_name': 'outro-music' }
         case ('OBS', 'play_media_input', _): return { 'media_input_name': 'outro-music' }
         case ('OBS', 'restart_media_input', _): return { 'media_input_name': 'outro-music' }
+        case ('OBS', 'set_current_scene', _): return { 'scene_name': 'intro_scene' }
         case ('OBS', 'set_current_scene_transition', _): return { 'transition_name': 'epic-transition' }
         case ('OBS', 'set_input_volume', _): return { 'input_name': 'intro-song', 'volume': 12 }
         case ('OBS', 'stop_media_input', _): return { 'media_input_name': 'outro-music' }
@@ -107,7 +113,7 @@ def syntax_highlight_python_function_call(code: str):
 def get_function_call_example(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
     function_name = function.name
     return_value_mappings = get_example_return_value_mappings(function_name, module_name)
-    arg_value_mappings = get_example_arg_mappings(function_name, module_name, 'OBS.EVENT_OBS_EXIT')  # TODO: Make this not hardcoded
+    arg_value_mappings = get_example_arg_mappings(function_name, module_name, 'OBS.EVENT_OBS_EXIT')  # TODO: Make this not hardcoded to properly handle overloads
     args_list = (get_example_arg_key_value(k.arg, module_name, function_name, arg_value_mappings, constant_value_to_names) for k in function.args.args)
     raw_text_example = f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
                        f'{module_name}.{function_name}' + \
@@ -117,12 +123,14 @@ def get_function_call_example(function: ast.FunctionDef, module_name: str, const
 
 def get_function_return_type(function: ast.FunctionDef):
     match function.returns:
-        case None: return 'MISSING_RETURN_TYPE'
+        case None:
+            print(f'Missing return type found: {function.returns} in {function.name}')
+            return 'MISSING_RETURN_TYPE'
         case ast.Constant(value): return value
         case ast.Name(value): return value
         case ast.Subscript(ast.Name(value), ast.Name(type_args)): return f'{value}[{type_args}]'
         case _:
-            print(f'Unknown return type found: {function.returns}')
+            print(f'Unhandled return type found: {function.returns} in {function.name}')
             return 'UNKNOWN_RETURN_TYPE'
 
 def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_to_names: dict[Any, str]):
