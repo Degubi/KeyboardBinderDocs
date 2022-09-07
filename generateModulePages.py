@@ -19,9 +19,9 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Common', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
         case ('Common', 'exec_command', _): return { 'command': 'explorer https://google.com' }
         case ('Common', 'wait', _): return { 'seconds': 3.5 }
-        case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key', _): return { 'modifier_key': 16 }
+        case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key', _): return { 'modifiers': 1 }
         case ('Keyboard', 'type', _): return { 'text': 'hi team' }
-        case ('Keyboard', 'while_holding_modifier_key', _): return { 'modifier_key': 17, 'action': 'lambda: Keyboard.type(\'S\')' }
+        case ('Keyboard', 'while_holding_modifier_key', _): return { 'modifiers': 2, 'action': 'lambda: Keyboard.type(\'S\')' }
         case ('Mouse', 'click', _): return { 'button': 1024 }
         case ('Mouse', 'hold', _): return { 'button': 4096 }
         case ('Mouse', 'move_cursor_to', _): return { 'x': 50, 'y': 50 }
@@ -113,6 +113,10 @@ def syntax_highlight_python_function_call(code: str):
 def get_function_call_example(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
     function_name = function.name
     return_value_mappings = get_example_return_value_mappings(function_name, module_name)
+
+    if not isinstance(function.returns, ast.Constant) and len(return_value_mappings) == 0:
+        print(f'Unmapped return value found for \'{module_name}.{function.name}\'')
+
     arg_value_mappings = get_example_arg_mappings(function_name, module_name, 'OBS.EVENT_OBS_EXIT')  # TODO: Make this not hardcoded to properly handle overloads
     args_list = (get_example_arg_key_value(k.arg, module_name, function_name, arg_value_mappings, constant_value_to_names) for k in function.args.args)
     raw_text_example = f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
@@ -148,7 +152,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
             else:
                 union_values: list[ast.Constant] = type_params  # type: ignore
 
-                return f'{arg_name}: {" | ".join(get_optional_named_parameter_value(k.value, module_name, constant_value_to_names) for k in union_values)}'
+                return f'{arg_name}: {" | ".join(get_optional_named_parameter_value(k.value, module_name, constant_value_to_names) for k in union_values if k.value in constant_value_to_names)}'
         case _:
             print(f'Unknown arg type found: {arg.annotation}')
             return 'UNKNOWN_ARG_TYPE'
