@@ -2,7 +2,7 @@ import builtins
 import ast
 from itertools import groupby
 from os import listdir
-from typing import Any, Callable
+from typing import Any
 
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
@@ -26,7 +26,8 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Mouse', 'hold', _): return { 'button': 4096 }
         case ('Mouse', 'move_cursor_to', _): return { 'x': 50, 'y': 50 }
         case ('Mouse', 'release', _): return { 'button': 4096 }
-        case ('OBS', 'add_event_listener', 'OBS.EVENT_OBS_EXIT'): return { 'event': 'ExitStarted', 'on_exit': 'lambda: print(\'We closin\')' }
+        case ('OBS', 'add_event_listener', 'ExitStarted'): return { 'event': 'ExitStarted', 'on_exit': 'lambda: print(\'We closin\')' }
+        case ('OBS', 'add_event_listener', 'CurrentProgramSceneChanged'): return { 'event': 'CurrentProgramSceneChanged', 'on_change': 'lambda scene_name: print(\'Scene name changed\')' }
         case ('OBS', 'get_input_volume', _): return { 'input_name': 'intro-song' }
         case ('OBS', 'get_is_input_muted', _): return { 'input_name': 'outro-song' }
         case ('OBS', 'pause_media_input', _): return { 'media_input_name': 'outro-music' }
@@ -40,6 +41,14 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('PremierePro', 'adjust_gain_level_by', _): return { 'level': 5 }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
         case _: return {}
+
+def get_lambda_parameter_names(module_name: str, function_name: str, arg_name: str):
+    match (module_name, function_name, arg_name):
+        case ('OBS', 'add_event_listener', 'on_change'): return [ 'new_scene_name' ]
+        case _: return []
+
+def is_overload_function_template(function: ast.FunctionDef, function_defs: list[ ast.FunctionDef ]):
+    return len(function.decorator_list) == 0 and any(k for k in function_defs if function != k and k.name == function.name)
 
 def get_constant_info(constant: ast.Assign):
     constant_name: ast.Name = constant.targets[0]  # type: ignore
@@ -81,7 +90,8 @@ def syntax_highlight_python_function_call(code: str):
             case ast.Constant(builtins.float(value)): return f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
             case ast.Attribute(ast.Name(module), constant): return f'{before_part}<span style = "color: var(--module-name-color)">{module}</span>.' + \
                                                                    f'<span style = "color: var(--constant-literal-color)">{constant}</span>{after_part}'
-            case ast.Lambda(_, body): return f'{before_part}<span style = "color: var(--boolean-literal-color)">lambda</span>: {syntax_highlight_python_function_call(code[body.col_offset : -1])})'
+            case ast.Lambda(args, body): return f'{before_part}<span style = "color: var(--boolean-literal-color)">lambda</span>' + \
+                                                f'{(" " if len(args.args) > 0 else "") + ", ".join(k.arg for k in args.args)}: {syntax_highlight_python_function_call(code[body.col_offset : -1])})'
             case _:
                 print(f'Unknown arg type found: {arg}')
                 return ''
@@ -117,7 +127,10 @@ def get_function_call_example(function: ast.FunctionDef, module_name: str, const
     if not isinstance(function.returns, ast.Constant) and len(return_value_mappings) == 0:
         print(f'Unmapped return value found for \'{module_name}.{function.name}\'')
 
-    arg_value_mappings = get_example_arg_mappings(function_name, module_name, 'OBS.EVENT_OBS_EXIT')  # TODO: Make this not hardcoded to properly handle overloads
+    overload_arg_info = function.args.args[0].annotation if len(function.args.args) > 0 else None
+    overload_arg_value = overload_arg_info.slice.value if isinstance(overload_arg_info, ast.Subscript) and isinstance(overload_arg_info.slice, ast.Constant) else None
+
+    arg_value_mappings = get_example_arg_mappings(function_name, module_name, overload_arg_value)
     args_list = (get_example_arg_key_value(k.arg, module_name, function_name, arg_value_mappings, constant_value_to_names) for k in function.args.args)
     raw_text_example = f'{", ".join(return_value_mappings)}{" = " if len(return_value_mappings) > 0 else ""}' + \
                        f'{module_name}.{function_name}' + \
@@ -127,17 +140,17 @@ def get_function_call_example(function: ast.FunctionDef, module_name: str, const
 
 def get_function_return_type(function: ast.FunctionDef):
     match function.returns:
-        case None:
-            print(f'Missing return type found: {function.returns} in {function.name}')
-            return 'MISSING_RETURN_TYPE'
         case ast.Constant(value): return value
         case ast.Name(value): return value
         case ast.Subscript(ast.Name(value), ast.Name(type_args)): return f'{value}[{type_args}]'
+        case None:
+            print(f'Missing return type found: {function.returns} in {function.name}')
+            return 'MISSING_RETURN_TYPE'
         case _:
             print(f'Unhandled return type found: {function.returns} in {function.name}')
             return 'UNKNOWN_RETURN_TYPE'
 
-def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_to_names: dict[Any, str]):
+def get_function_arg_description(arg: ast.arg, module_name: str, function_name: str, constant_value_to_names: dict[Any, str]):
     arg_name = arg.arg
 
     match arg.annotation:
@@ -145,10 +158,11 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
         case ast.Subscript(_, ast.Constant(value)): return f'{arg_name}: {get_optional_named_parameter_value(value, module_name, constant_value_to_names)}'
         case ast.Subscript(_, ast.Tuple(type_params)):
             if isinstance(type_params[0], ast.List):
-                function_arg_types: list[ast.Constant] = type_params[0].elts  # type: ignore
+                function_arg_types: list[ast.Name] = type_params[0].elts  # type: ignore
                 function_return_type: ast.Constant = type_params[1]  # type: ignore
+                lambda_arg_names = get_lambda_parameter_names(module_name, function_name, arg_name)
 
-                return f'{arg_name}: ({", ".join(k.value for k in function_arg_types)}) -> {function_return_type.value}'
+                return f'{arg_name}: ({", ".join(f"{lambda_arg_names[i]}: {function_arg_types[i].id}" for i in range(0, len(function_arg_types)))}) -> {function_return_type.value}'
             else:
                 union_values: list[ast.Constant] = type_params  # type: ignore
 
@@ -159,7 +173,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, constant_value_
 
 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
-    return f'<h3 id = "{function.name}">{function.name}({", ".join(get_function_arg_description(k, module_name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
+    return f'<h3 id = "{function.name}">{function.name}({", ".join(get_function_arg_description(k, module_name, function.name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
            f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
@@ -182,10 +196,9 @@ for module_file in MODULE_FILES:
         constant_names = list(constant_value_to_names.values())
         constant_names.sort()
         constant_groups = dict((k, list(v)) for k, v in groupby(constant_names, key = lambda k: k[0 : k.index('_')]))
-        is_overload_function_filter: Callable[[ ast.FunctionDef ], bool ] = lambda fn: not any(k for k in function_defs if k != fn and k.name == fn.name and len(k.decorator_list) > 0)
 
         constant_group_descriptions = [ f'<h3>{" | ".join(group_items)}</h3>' for _, group_items in constant_groups.items() ]
-        function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs if is_overload_function_filter(k) ]
+        function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs if not is_overload_function_template(k, function_defs) ]
         module_import_text = '<p class = "code-example">' + \
                                '<span style="color: var(--keyword-color)">from</span> ' + \
                                '<span style="color: var(--module-name-color)">keyboardBinder</span> ' + \
