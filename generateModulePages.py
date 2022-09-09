@@ -6,6 +6,7 @@ from typing import Any
 
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
+        case ('Application', 'is_debug_console_visible'): return [ 'visible' ]
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
         case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
         case ('Keyboard', 'is_alt_key_down' | 'is_ctrl_key_down' | 'is_shift_key_down'): return [ 'is_down' ]
@@ -16,9 +17,9 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
 
 def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
     match(module_name, function_name, overload_name):
-        case ('Common', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
-        case ('Common', 'exec_command', _): return { 'command': 'explorer https://google.com' }
-        case ('Common', 'wait', _): return { 'seconds': 3.5 }
+        case ('Application', 'set_debug_console_visible', _): return { 'visible': True }
+        case ('Application', 'start_interaction_recorder', _): return { 'result_consumer': 'lambda result: print(\'Use result here\')' }
+        case ('Application', 'wait', _): return { 'seconds': 3.5 }
         case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key', _): return { 'modifiers': 1 }
         case ('Keyboard', 'type', _): return { 'text': 'hi team' }
         case ('Keyboard', 'while_holding_modifier_key', _): return { 'modifiers': 2, 'action': 'lambda: Keyboard.type(\'S\')' }
@@ -40,10 +41,13 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('OBS', 'set_input_is_muted', _): return { 'input_name': 'epic-frag-song', 'muted': False }
         case ('PremierePro', 'adjust_gain_level_by', _): return { 'level': 5 }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
+        case ('Windows', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
+        case ('Windows', 'exec_command', _): return { 'command': 'explorer https://google.com' }
         case _: return {}
 
 def get_lambda_parameter_names(module_name: str, function_name: str, arg_name: str):
     match (module_name, function_name, arg_name):
+        case ('Application', 'start_interaction_recorder', 'result_consumer'): return [ 'recording_result' ]
         case ('OBS', 'add_event_listener', 'on_change'): return [ 'new_scene_name' ]
         case _: return []
 
@@ -161,6 +165,11 @@ def get_function_arg_description(arg: ast.arg, module_name: str, function_name: 
                 function_arg_types: list[ast.Name] = type_params[0].elts  # type: ignore
                 function_return_type: ast.Constant = type_params[1]  # type: ignore
                 lambda_arg_names = get_lambda_parameter_names(module_name, function_name, arg_name)
+
+                if len(lambda_arg_names) != len(function_arg_types):
+                    print(f'Unmapped lambda params found in {module_name}.{function_name}, arg name: {arg_name}')
+
+                    return f'{arg_name}: ({", ".join(f"UNKNOWN_ARG: {function_arg_types[i].id}" for i in range(0, len(function_arg_types)))}) -> {function_return_type.value}'
 
                 return f'{arg_name}: ({", ".join(f"{lambda_arg_names[i]}: {function_arg_types[i].id}" for i in range(0, len(function_arg_types)))}) -> {function_return_type.value}'
             else:
