@@ -6,7 +6,7 @@ from typing import Any
 
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
-        case ('Application', 'is_debug_console_visible'): return [ 'visible' ]
+        case ('Application', 'is_debug_console_enabled'): return [ 'visible' ]
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
         case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
         case ('Keyboard', 'is_alt_key_down' | 'is_ctrl_key_down' | 'is_shift_key_down'): return [ 'is_down' ]

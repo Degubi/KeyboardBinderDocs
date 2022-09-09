@@ -15,32 +15,73 @@ window.addEventListener('popstate', event => {
 });
 
 /** @param { string } pagePath */
-function forceShowPage(pagePath) {
-    fetch(`pages/${pagePath}.html`)
-    .then(k => k.text())
-    .then(k => contentElement.innerHTML = k)
-    .then(_ => {
-        if(hash !== '') {
-            document.getElementById(hash.substring(1)).scrollIntoView();
-        }
-    });
+async function forceShowPage(pagePath) {
+    const htmlContent = await fetch(`pages/${pagePath}.html`).then(k => k.text());
+
+    contentElement.innerHTML = htmlContent;
+
+    if(hash !== '') {
+        document.getElementById(hash.substring(1)).scrollIntoView();
+    }
+
+    return htmlContent;
 }
 
 /** @param { string } pagePath */
 function showPage(pagePath) {
+    contentElement.scrollTo(0, 0);
+
     if(pagePath !== currentPage) {
         currentPage = pagePath;
         window.history.pushState(currentPage, null, `?page=${pagePath}`);
-        forceShowPage(pagePath);
+        return forceShowPage(pagePath);
     }
+
+    return null;
 }
+
+window.customElements.define('module-dropdown-button', class extends HTMLElement {
+
+    constructor() {
+        super();
+    }
+
+    connectedCallback() {
+        const modulePagePath = this.getAttribute('module-page-path');
+
+        const button = document.createElement('button');
+        button.className = 'module-button';
+        button.innerHTML = this.getAttribute('module-label');
+
+        const dropdownContainer = document.createElement('div');
+        dropdownContainer.style.display = 'none';
+        dropdownContainer.style.backgroundColor = '#818181';
+
+        button.addEventListener('click', async _ => {
+            const pageContent = await showPage(modulePagePath);
+
+            if(dropdownContainer.innerHTML === '') {
+                const functionHeaderTags = new Array(...new DOMParser().parseFromString(pageContent, 'text/html').getElementsByTagName('h3'));
+
+                dropdownContainer.innerHTML = functionHeaderTags.map(k => k.id)
+                                                                .filter((k, i, a) => k !== '' && a.indexOf(k) === i)
+                                                                .map(k => `<button class = "function-button" onclick = "window.location.hash = '#' + '${k}'">${k}</button>`)
+                                                                .join('');
+            }
+
+            dropdownContainer.style.display = dropdownContainer.style.display === 'block' ? 'none' : 'block';
+        });
+
+        this.style.display = 'block';
+        this.appendChild(button);
+        this.appendChild(dropdownContainer);
+    }
+});
 
 
 // @ts-ignore
 window.toggleDropdownButton = k => k.nextElementSibling.style.display = k.nextElementSibling.style.display === 'block' ? 'none' : 'block';
 // @ts-ignore
 window.showPage = showPage;
-// @ts-ignore
-window.onAnchorClick = k => window.location.hash = '#' + k;
 
 export {};
