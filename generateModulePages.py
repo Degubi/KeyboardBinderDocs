@@ -25,7 +25,7 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Keyboard', 'while_holding_modifier_key', _): return { 'modifiers': 2, 'action': 'lambda: Keyboard.type(\'S\')' }
         case ('Mouse', 'click', _): return { 'button': 1024 }
         case ('Mouse', 'hold', _): return { 'button': 4096 }
-        case ('Mouse', 'move_cursor_to', _): return { 'x': 50, 'y': 50 }
+        case ('Mouse', 'set_cursor_location', _): return { 'x': 50, 'y': 50 }
         case ('Mouse', 'release', _): return { 'button': 4096 }
         case ('OBS', 'add_event_listener', 'ExitStarted'): return { 'event': 'ExitStarted', 'on_exit': 'lambda: print(\'We closin\')' }
         case ('OBS', 'add_event_listener', 'CurrentProgramSceneChanged'): return { 'event': 'CurrentProgramSceneChanged', 'on_change': 'lambda scene_name: print(\'Scene name changed\')' }
@@ -39,7 +39,10 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('OBS', 'set_input_volume', _): return { 'input_name': 'intro-song', 'volume': 12 }
         case ('OBS', 'stop_media_input', _): return { 'media_input_name': 'outro-music' }
         case ('OBS', 'set_input_is_muted', _): return { 'input_name': 'epic-frag-song', 'muted': False }
-        case ('PremierePro', 'adjust_gain_level_by', _): return { 'level': 5 }
+        case ('PremierePro', 'adjust_gain_level_on_selection', _): return { 'level': 5 }
+        case ('PremierePro', 'set_scale_to_frame_size_on_selection', _): return { 'enabled': True }
+        case ('PremierePro', 'add_audio_effect_to_selection', _): return { 'effect_name': 'Bass' }
+        case ('PremierePro', 'add_video_effect_to_selection', _): return { 'effect_name': 'Gamma Correction' }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
         case ('Windows', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
         case ('Windows', 'exec_command', _): return { 'command': 'explorer https://google.com' }
