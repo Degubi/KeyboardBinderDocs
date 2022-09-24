@@ -3,56 +3,8 @@ import ast
 from itertools import groupby
 from os import listdir
 from typing import Any
+from apiMappings import get_example_arg_mappings, get_example_return_value_mappings, get_lambda_parameter_names
 
-def get_example_return_value_mappings(function_name: str, module_name: str):
-    match(module_name, function_name):
-        case ('Application', 'is_debug_console_enabled'): return [ 'visible' ]
-        case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
-        case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
-        case ('Keyboard', 'is_alt_key_down' | 'is_ctrl_key_down' | 'is_shift_key_down'): return [ 'is_down' ]
-        case ('OBS', 'get_current_scene_name'): return [ 'scene_name' ]
-        case ('OBS', 'get_is_input_muted'): return [ 'is_muted' ]
-        case ('OBS', 'get_input_volume'): return [ 'volume' ]
-        case _: return []
-
-def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
-    match(module_name, function_name, overload_name):
-        case ('Application', 'set_debug_console_visible', _): return { 'visible': True }
-        case ('Application', 'start_interaction_recorder', _): return { 'result_consumer': 'lambda result: print(\'Use result here\')' }
-        case ('Application', 'wait', _): return { 'seconds': 3.5 }
-        case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key', _): return { 'modifiers': 1 }
-        case ('Keyboard', 'type', _): return { 'text': 'hi team' }
-        case ('Keyboard', 'while_holding_modifier_key', _): return { 'modifiers': 2, 'action': 'lambda: Keyboard.type(\'S\')' }
-        case ('Mouse', 'click', _): return { 'button': 1024 }
-        case ('Mouse', 'hold', _): return { 'button': 4096 }
-        case ('Mouse', 'set_cursor_location', _): return { 'x': 50, 'y': 50 }
-        case ('Mouse', 'release', _): return { 'button': 4096 }
-        case ('OBS', 'add_event_listener', 'ExitStarted'): return { 'event': 'ExitStarted', 'on_exit': 'lambda: print(\'We closin\')' }
-        case ('OBS', 'add_event_listener', 'CurrentProgramSceneChanged'): return { 'event': 'CurrentProgramSceneChanged', 'on_change': 'lambda scene_name: print(\'Scene name changed\')' }
-        case ('OBS', 'get_input_volume', _): return { 'input_name': 'intro-song' }
-        case ('OBS', 'get_is_input_muted', _): return { 'input_name': 'outro-song' }
-        case ('OBS', 'pause_media_input', _): return { 'media_input_name': 'outro-music' }
-        case ('OBS', 'play_media_input', _): return { 'media_input_name': 'outro-music' }
-        case ('OBS', 'restart_media_input', _): return { 'media_input_name': 'outro-music' }
-        case ('OBS', 'set_current_scene', _): return { 'scene_name': 'intro_scene' }
-        case ('OBS', 'set_current_scene_transition', _): return { 'transition_name': 'epic-transition' }
-        case ('OBS', 'set_input_volume', _): return { 'input_name': 'intro-song', 'volume': 12 }
-        case ('OBS', 'stop_media_input', _): return { 'media_input_name': 'outro-music' }
-        case ('OBS', 'set_input_is_muted', _): return { 'input_name': 'epic-frag-song', 'muted': False }
-        case ('PremierePro', 'adjust_gain_level_on_selection', _): return { 'level': 5 }
-        case ('PremierePro', 'set_scale_to_frame_size_on_selection', _): return { 'enabled': True }
-        case ('PremierePro', 'add_audio_effect_to_selection', _): return { 'effect_name': 'Bass' }
-        case ('PremierePro', 'add_video_effect_to_selection', _): return { 'effect_name': 'Gamma Correction' }
-        case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
-        case ('Windows', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
-        case ('Windows', 'exec_command', _): return { 'command': 'explorer https://google.com' }
-        case _: return {}
-
-def get_lambda_parameter_names(module_name: str, function_name: str, arg_name: str):
-    match (module_name, function_name, arg_name):
-        case ('Application', 'start_interaction_recorder', 'result_consumer'): return [ 'recording_result' ]
-        case ('OBS', 'add_event_listener', 'on_change'): return [ 'new_scene_name' ]
-        case _: return []
 
 def is_overload_function_template(function: ast.FunctionDef, function_defs: list[ ast.FunctionDef ]):
     return len(function.decorator_list) == 0 and any(k for k in function_defs if function != k and k.name == function.name)
@@ -212,17 +164,17 @@ for module_file in MODULE_FILES:
         constant_group_descriptions = [ f'<h3>{" | ".join(group_items)}</h3>' for _, group_items in constant_groups.items() ]
         function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs if not is_overload_function_template(k, function_defs) ]
         module_import_text = '<p class = "code-example">' + \
-                               '<span style="color: var(--keyword-color)">from</span> ' + \
-                               '<span style="color: var(--module-name-color)">keyboardBinder</span> ' + \
-                               '<span style="color: var(--keyword-color)">import</span> ' + \
+                               '<span style="color: var(--keyword-color)">from </span>' + \
+                               '<span style="color: var(--module-name-color)">keyboardBinder </span>' + \
+                               '<span style="color: var(--keyword-color)">import </span>' + \
                               f'<span style="color: var(--module-name-color)">{module_name}</span>' + \
                              '</p>'
 
-        output_file.write(f'<h1>{module_name} module</h1>' +
-                          f'<p>{ast.get_docstring(module_node)}</p><br>' +
-                          '<h2>Importing</h2>' + module_import_text +
-                          ('<h2>Constants</h2><hr>' if len(constant_group_descriptions) > 0 else '') +
-                           '<hr>'.join(constant_group_descriptions) +
+        output_file.write(f'<h1>{module_name} module</h1>\n' +
+                          f'<p>{ast.get_docstring(module_node)}</p><br>\n' +
+                          '<h2>Importing</h2>\n' + module_import_text + '\n' +
+                          ('<h2>Constants</h2><hr>\n' if len(constant_group_descriptions) > 0 else '') +
+                           '<hr>\n'.join(constant_group_descriptions) +
                           ('<br>' if len(constant_group_descriptions) > 0 else '') +
-                          ('<h2>Functions</h2><hr>' if len(function_descriptions) > 0 else '') +
-                           '<hr>'.join(function_descriptions))
+                          ('<h2>Functions</h2><hr>\n' if len(function_descriptions) > 0 else '') +
+                           '<hr>\n'.join(function_descriptions))
