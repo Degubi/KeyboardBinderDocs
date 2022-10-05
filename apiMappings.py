@@ -41,8 +41,8 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('PremierePro', 'add_video_effect_to_selection', _): return { 'effect_name': 'Gamma Correction' }
         case ('PremierePro', 'insert_item_at_player_position', _): return { 'item_path': 'Bin1/Bin2/ClipOrSequenceName' }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
-        case ('Windows', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
-        case ('Windows', 'exec_command', _): return { 'command': 'explorer https://google.com' }
+        case ('Desktop', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
+        case ('Desktop', 'exec_command', _): return { 'command': 'explorer https://google.com' }
         case _: return {}
 
 def get_lambda_parameter_names(module_name: str, function_name: str, arg_name: str):
