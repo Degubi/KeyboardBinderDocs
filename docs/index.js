@@ -21,7 +21,10 @@ async function forceShowPage(pagePath) {
     contentElement.innerHTML = htmlContent;
 
     if(hash !== '') {
-        document.getElementById(hash.substring(1)).scrollIntoView();
+        const hashedElement = document.getElementById(hash.substring(1));
+
+        hashedElement.scrollIntoView();
+        window.getSelection().selectAllChildren(hashedElement);
     }
 
     return htmlContent;
