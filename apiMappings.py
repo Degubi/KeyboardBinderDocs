@@ -4,6 +4,7 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
         case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
         case ('PremierePro', 'get_audio_gain_level_from_selection'): return [ 'gain_level' ]
+        case ('PremierePro', 'get_selected_clip_media_paths'): return [ 'media_paths' ]
         case ('PremierePro', 'get_scale_to_frame_size_from_selection'): return [ 'scale_enabled' ]
         case ('Keyboard', 'is_alt_key_down' | 'is_ctrl_key_down' | 'is_shift_key_down'): return [ 'is_down' ]
         case ('OBS', 'get_current_scene_name'): return [ 'scene_name' ]
