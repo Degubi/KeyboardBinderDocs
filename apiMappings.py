@@ -1,6 +1,8 @@
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
         case ('Application', 'is_debug_console_enabled'): return [ 'visible' ]
+        case ('Desktop', 'get_master_volume_level'): return [ 'volume_level' ]
+        case ('Desktop', 'get_process_volume_level'): return [ 'volume_level' ]
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
         case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
         case ('PremierePro', 'get_audio_gain_level_from_selection'): return [ 'gain_level' ]
@@ -19,6 +21,9 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Application', 'wait', _): return { 'seconds': 3.5 }
         case ('Desktop', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
         case ('Desktop', 'exec_command', _): return { 'command': 'explorer https://google.com' }
+        case ('Desktop', 'get_process_volume_level', _): return { 'process_name': 'ts3client_win64.exe' }
+        case ('Desktop', 'set_master_volume_level', _): return { 'value': 50 }
+        case ('Desktop', 'set_process_volume_level', _): return { 'value': 50, 'process_name': 'ts3client_win64.exe' }
         case ('Desktop', 'move_file_to_trash', _): return { 'file_path': 'pic_of_ex.png' }
         case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key', _): return { 'modifiers': 1 }
         case ('Keyboard', 'type', _): return { 'text': 'hi team' }
