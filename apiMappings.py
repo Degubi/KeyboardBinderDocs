@@ -6,8 +6,9 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
         case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
         case ('PremierePro', 'get_audio_gain_level_from_selection'): return [ 'gain_level' ]
-        case ('PremierePro', 'get_selected_clip_media_paths'): return [ 'media_paths' ]
+        case ('PremierePro', 'get_media_paths_from_selection'): return [ 'media_paths' ]
         case ('PremierePro', 'get_scale_to_frame_size_from_selection'): return [ 'scale_enabled' ]
+        case ('PremierePro', 'get_speed_from_selection'): return [ 'speed' ]
         case ('Keyboard', 'is_alt_key_down' | 'is_ctrl_key_down' | 'is_shift_key_down'): return [ 'is_down' ]
         case ('OBS', 'get_current_scene_name'): return [ 'scene_name' ]
         case ('OBS', 'get_is_input_muted'): return [ 'is_muted' ]
@@ -46,6 +47,7 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('OBS', 'set_input_is_muted', _): return { 'input_name': 'epic-frag-song', 'muted': False }
         case ('PremierePro', 'adjust_audio_gain_level_on_selection' | 'set_audio_gain_level_on_selection', _): return { 'level': 5 }
         case ('PremierePro', 'set_scale_to_frame_size_on_selection', _): return { 'enabled': True }
+        case ('PremierePro', 'set_speed_on_selection', _): return { 'value': 42 }
         case ('PremierePro', 'add_audio_effect_to_selection', _): return { 'effect_name': 'Bass' }
         case ('PremierePro', 'add_video_effect_to_selection', _): return { 'effect_name': 'Gamma Correction' }
         case ('PremierePro', 'insert_item_at_player_position', _): return { 'item_path': 'Bin1/Bin2/ClipOrSequenceName' }
