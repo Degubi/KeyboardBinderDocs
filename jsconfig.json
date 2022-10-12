@@ -13,6 +13,5 @@
         "allowUnusedLabels": false,
         "allowUnreachableCode": false,
         "allowSyntheticDefaultImports": true
-    },
-    "exclude": [ "node_modules" ]
+    }
 }
