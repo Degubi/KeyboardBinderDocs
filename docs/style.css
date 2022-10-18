@@ -58,17 +58,17 @@ body {
     padding: 8px 8px 8px 16px;
 }
 
-.module-button {
+.first-level-dropdown-button {
     font-size: 18px;
     padding: 8px 8px 8px 24px;
 }
 
-.function-button {
+.second-level-dropdown-button {
     padding: 4px 8px 4px 32px;
     font-size: 16px;
 }
 
-#modules-top-dropdown-container {
+.dropdown-container {
     display: none;
     background-color: #262626;
 }

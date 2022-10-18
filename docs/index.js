@@ -1,8 +1,7 @@
 const contentElement = document.getElementById('content');
 let currentPage = new URLSearchParams(window.location.search).get('page') ?? 'about';
-const hash = window.location.hash;
 
-window.history.replaceState(currentPage, null, `?page=${currentPage}${hash}`);
+window.history.replaceState(currentPage, null, `?page=${currentPage}${window.location.hash}`);
 forceShowPage(currentPage);
 
 window.addEventListener('popstate', event => {
@@ -17,6 +16,7 @@ window.addEventListener('popstate', event => {
 /** @param { string } pagePath */
 async function forceShowPage(pagePath) {
     const htmlContent = await fetch(`pages/${pagePath}.html`).then(k => k.text());
+    const hash = window.location.hash;
 
     contentElement.innerHTML = htmlContent;
 
@@ -35,13 +35,14 @@ function showPage(pagePath) {
     contentElement.scrollTo(0, 0);
 
     if(pagePath !== currentPage) {
-        currentPage = pagePath;
         window.history.pushState(currentPage, null, `?page=${pagePath}`);
-        return forceShowPage(pagePath);
     }
 
-    return null;
+    currentPage = pagePath;
+
+    return forceShowPage(pagePath);
 }
+
 
 window.customElements.define('module-dropdown-button', class extends HTMLElement {
 
@@ -52,32 +53,32 @@ window.customElements.define('module-dropdown-button', class extends HTMLElement
     connectedCallback() {
         const modulePagePath = this.getAttribute('module-page-path');
 
-        const button = document.createElement('button');
-        button.className = 'module-button';
-        button.innerHTML = this.getAttribute('module-label');
+        const moduleButton = document.createElement('button');
+        moduleButton.className = 'first-level-dropdown-button';
+        moduleButton.innerHTML = this.getAttribute('module-label');
 
-        const dropdownContainer = document.createElement('div');
-        dropdownContainer.style.display = 'none';
-        dropdownContainer.style.backgroundColor = '#818181';
+        const functionListDropdown = document.createElement('div');
+        functionListDropdown.style.display = 'none';
+        functionListDropdown.style.backgroundColor = '#818181';
 
-        button.addEventListener('click', async _ => {
+        moduleButton.addEventListener('click', async _ => {
             const pageContent = await showPage(modulePagePath);
 
-            if(dropdownContainer.innerHTML === '') {
+            if(functionListDropdown.innerHTML === '') {
                 const functionHeaderTags = new Array(...new DOMParser().parseFromString(pageContent, 'text/html').getElementsByTagName('h3'));
 
-                dropdownContainer.innerHTML = functionHeaderTags.map(k => k.id)
+                functionListDropdown.innerHTML = functionHeaderTags.map(k => k.id)
                                                                 .filter((k, i, a) => k !== '' && a.indexOf(k) === i)
-                                                                .map(k => `<button class = "function-button" onclick = "window.location.hash = '#' + '${k}'">${k}</button>`)
+                                                                .map(k => `<button class = "second-level-dropdown-button" onclick = "window.location.hash = '#' + '${k}'">${k}</button>`)
                                                                 .join('');
             }
 
-            dropdownContainer.style.display = dropdownContainer.style.display === 'block' ? 'none' : 'block';
+            functionListDropdown.style.display = functionListDropdown.style.display === 'block' ? 'none' : 'block';
         });
 
         this.style.display = 'block';
-        this.appendChild(button);
-        this.appendChild(dropdownContainer);
+        this.appendChild(moduleButton);
+        this.appendChild(functionListDropdown);
     }
 });
 
