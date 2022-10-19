@@ -1,16 +1,12 @@
 <h1>OBS Integration</h1>
+<h2>Connecting</h2>
+<p class = "code-example">
+    <span style="color: var(--keyword-color)">from </span><span style="color: var(--module-name-color)">keyboardBinder </span><span style="color: var(--keyword-color)">import </span><span style="color: var(--module-name-color)">Application</span>
+    <br><br>
+    <span style="color: var(--module-name-color)">Application</span>.<span style = "color: var(--function-name-color)">connect_to_application</span>(<span style="color: var(--module-name-color)">Application</span>.<span style = "color: var(--constant-literal-color)">APP_OBS</span>)
+</p>
 <p>
-    OBS functionality is implemented through the OBS Websocket plugin. First make sure it is enabled in OBS settings.<br>
+    OBS integration is implemented through the OBS Websocket plugin. First make sure it is enabled in OBS settings.<br>
     To enable it tick the 'Enable Websocket server' option. It is also recommended to 'Enable System Tray Alerts' so that you know if you can actually connect to it.
 </p>
 <img src = "assets/connections/obs_websocket.png" width = "600">
-<br><br>
-<p>
-    Next steps are to connect to OBS from the application:
-</p>
-<ul>
-    <li>Open up 'Connections' from the tray icon menu</li>
-    <li>Click on the 'Toggle OBS' option</li>
-    <li>If you enabled the 'Enable System Tray Alerts' in OBS settings a notification should pop up regarding a successful connection</li>
-    <li>After this point all functions that are found in the OBS module should work</li>
-</ul>

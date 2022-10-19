@@ -1,7 +1,9 @@
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
-        case ('Application', 'connect_to_application'): return [ 'successful' ]
-        case ('Application', 'is_debug_console_enabled'): return [ 'visible' ]
+        case ('Application', 'connect_to_application'): return [ 'connection_successful' ]
+        case ('Application', 'is_connected_to_application'): return [ 'is_connected' ]
+        case ('Application', 'is_console_enabled'): return [ 'visible' ]
+        case ('Application', 'get_active_profiles'): return [ 'active_profile_names' ]
         case ('Desktop', 'get_master_volume_level'): return [ 'volume_level' ]
         case ('Desktop', 'get_process_volume_level'): return [ 'volume_level' ]
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
@@ -18,8 +20,9 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
 
 def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
     match(module_name, function_name, overload_name):
-        case ('Application', 'connect_to_application', _): return { 'app_name': 'ppro' }
-        case ('Application', 'set_debug_console_visible', _): return { 'visible': True }
+        case ('Application', 'connect_to_application', _): return { 'app_name': 'Premiere Pro' }
+        case ('Application', 'is_connected_to_application', _): return { 'app_name': 'Premiere Pro' }
+        case ('Application', 'set_console_visible', _): return { 'visible': True }
         case ('Application', 'start_interaction_recorder', _): return { 'result_consumer': 'lambda result: print(\'Use result here\')' }
         case ('Application', 'wait', _): return { 'seconds': 3.5 }
         case ('Desktop', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }

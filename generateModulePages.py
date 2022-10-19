@@ -142,7 +142,7 @@ def get_function_description(function: ast.FunctionDef, module_name: str, consta
            f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
 
-MODULES_DIR = '../KeyboardBinder/app/modules/keyboardBinder'
+MODULES_DIR = '../KeyboardBinder/modules/keyboardBinder'
 MODULE_FILES = (k for k in listdir(MODULES_DIR) if not k.startswith('_'))
 
 for module_file in MODULE_FILES:

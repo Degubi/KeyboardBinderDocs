@@ -1,0 +1,35 @@
+<h1>Application Configuration</h1>
+<p>
+    To start configuring the application select 'Settings' from the right click menu of the application's green keyboard tray icon:
+</p>
+<img src = "assets/configuration/trayIcon.jpg" style = "margin-right: 30px">
+<br><br><br>
+<h2>Keyboards</h2>
+<p>
+    First we need to add the keyboard(s) that we intend to use for scripting:
+</p>
+<ul>
+    <li>Select the 'Keyboards' tab on the top</li>
+    <li>Enter the keyboard's name</li>
+    <li>Select a physical keyboard by following the instructions on the screen after clicking on the 'Pick Physical Keyboard' button</li>
+    <li>Click the 'Add' button on the right side</li>
+</ul>
+<h2>Profiles</h2>
+<p>
+    After adding a keyboard the next step is to create a profile:
+</p>
+<ul>
+    <li>Select 'Profiles' tab on the top</li>
+    <li>Enter the profile's name</li>
+    <li>Select a keyboard</li>
+    <li>Pick an activation key ranging from F1 to F11</li>
+    <li>Click the 'Create' button on the right side</li>
+</ul>
+<h2>Scripts Folder</h2>
+<p>
+    Profiles are stored in the application's 'scripts' folder, in this folder each subfolder represents a profile.<br>
+    There's also a special script file that gets created upon profile creation called '__events__.py'.<br>
+    This script file contains functions that get called on different lifecycle events of the profile.<br>
+    For example 'on_activate' gets called when the given profile gets activated.<br>
+    These functions can be used to e.g connect to other applications or to setup input blocking, or to do clean up.
+</p>
