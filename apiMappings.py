@@ -1,5 +1,6 @@
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
+        case ('Application', 'block_keyboard_input'): return [ 'blocking_successful' ]
         case ('Application', 'connect_to_application'): return [ 'connection_successful' ]
         case ('Application', 'is_connected_to_application'): return [ 'is_connected' ]
         case ('Application', 'is_console_enabled'): return [ 'visible' ]
@@ -20,6 +21,7 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
 
 def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
     match(module_name, function_name, overload_name):
+        case ('Application', 'block_keyboard_input', _): return { 'app_name': 'Premiere Pro' }
         case ('Application', 'connect_to_application', _): return { 'app_name': 'Premiere Pro' }
         case ('Application', 'is_connected_to_application', _): return { 'app_name': 'Premiere Pro' }
         case ('Application', 'set_console_visible', _): return { 'visible': True }
