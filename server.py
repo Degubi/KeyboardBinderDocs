@@ -1,6 +1,16 @@
 import http.server
 import socketserver
 
+http.server.SimpleHTTPRequestHandler.extensions_map = {
+    '.html': 'text/html',
+    '.png' : 'image/png',
+    '.jpg' : 'image/jpg',
+    '.svg' : 'image/svg+xml',
+    '.css' : 'text/css',
+    '.js'  : 'text/javascript',
+    ''     : 'application/octet-stream'
+}
+
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def __init__(self, *args, **kwargs):

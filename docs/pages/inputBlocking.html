@@ -2,5 +2,26 @@
 <p>
     It can be useful to block the normal keyboard inputs when pressing keys that run scripts.<br>
     Keyboard Binder uses selective input blocking, which means you have to manually block keyboard inputs in processes.<br>
-    TODO TODO
+</p>
+<br>
+<h2>Blocking</h2>
+<p>
+    To start blocking an application's keyboard input use the 'block_keyboard_input' function found in the 'Application' module, like so:
+</p>
+<p class = "code-example"><span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--function-name-color)">block_keyboard_input</span>(<span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--constant-literal-color)">APP_PREMIERE_PRO</span>)</p>
+<p>
+    This code blocks the keyboard input in Premiere Pro. The keyboard which input gets blocked is the current profile's keyboard.
+</p>
+<h2>Notes</h2>
+<p>
+    It is worth noting that you only need to call 'block_keyboard_input' once, not before every keypress.<br>
+    For this reason it makes sense to put these calls in the profile's 'on_activate' event function, like this:
+</p>
+<p class = "code-example">
+    <span style = "color: var(--keyword-color)">def </span><span style = "color: var(--function-name-color)">on_activate</span>():<br>
+    <span style = "color: var(--module-name-color)">&nbsp;&nbsp;&nbsp;&nbsp;Application</span>.<span style = "color: var(--function-name-color)">block_keyboard_input</span>(<span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--constant-literal-color)">APP_PREMIERE_PRO</span>)
+</p>
+<h2>Unblocking</h2>
+<p>
+    Unblocking is done automatically when the profile gets disabled, or when Keyboard Binder closes.
 </p>
