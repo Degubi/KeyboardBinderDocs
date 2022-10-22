@@ -1,9 +1,10 @@
 import builtins
 import ast
 from itertools import groupby
-from os import listdir
 from typing import Any
 from apiMappings import get_example_arg_mappings, get_example_return_value_mappings, get_lambda_parameter_names
+
+MODULES_DIR = '../KeyboardBinder/modules/keyboardBinder'
 
 
 def is_overload_function_template(function: ast.FunctionDef, function_defs: list[ ast.FunctionDef ]):
@@ -18,7 +19,8 @@ def get_constant_info(constant: ast.Assign):
 def get_optional_named_parameter_value(value: Any, module_name: str, constant_value_to_names: dict[Any, str]):
     optional_constant_name = constant_value_to_names.get(value, None)
 
-    return f'{module_name}.{optional_constant_name}' if not optional_constant_name == None else str(value)
+    return f'{module_name}.{optional_constant_name}' if not optional_constant_name == None else \
+           f"'{value}'" if type(value) == str and not value.startswith('lambda') else str(value)
 
 def get_example_arg_key_value(arg_name: str, module_name: str, function_name: str, example_arg_value_mappings: dict[str, Any], constant_value_to_names: dict[Any, str]):
     arg_value = example_arg_value_mappings.get(arg_name, 'MISSING_ARG_VALUE')
@@ -109,11 +111,17 @@ def get_function_return_type(function: ast.FunctionDef):
             print(f'Unhandled return type found: {function.returns} in {function.name}')
             return 'UNKNOWN_RETURN_TYPE'
 
-def get_function_arg_description(arg: ast.arg, module_name: str, function_name: str, constant_value_to_names: dict[Any, str]):
+def get_dict_typing_definition_description(dict_typing_def: ast.Dict):
+    return '{ ' + ', '.join(f'{dict_typing_def.keys[i].value}: {dict_typing_def.values[i].id}' for i in range(len(dict_typing_def.keys))) + ' }'  # type: ignore
+
+def get_function_arg_description(arg: ast.arg, module_name: str, function_name: str, constant_value_to_names: dict[Any, str], dict_typing_defs: dict[str, ast.Dict]):
     arg_name = arg.arg
 
     match arg.annotation:
-        case ast.Name(id): return f'{arg_name}: {id}'
+        case ast.Name(id):
+            optional_dict_typing_def = dict_typing_defs.get(id, None)
+
+            return f'{arg_name}: {id}' if optional_dict_typing_def == None else f'{arg_name}: {get_dict_typing_definition_description(optional_dict_typing_def)}'
         case ast.Subscript(_, ast.Constant(value)): return f'{arg_name}: {get_optional_named_parameter_value(value, module_name, constant_value_to_names)}'
         case ast.Subscript(_, ast.Tuple(type_params)):
             if isinstance(type_params[0], ast.List):
@@ -130,29 +138,27 @@ def get_function_arg_description(arg: ast.arg, module_name: str, function_name: 
             else:
                 union_values: list[ast.Constant] = type_params  # type: ignore
 
-                return f'{arg_name}: {" | ".join(get_optional_named_parameter_value(k.value, module_name, constant_value_to_names) for k in union_values if k.value in constant_value_to_names)}'
+                return f'{arg_name}: {" | ".join(get_optional_named_parameter_value(k.value, module_name, constant_value_to_names) for k in union_values if type(k.value) == str or k.value in constant_value_to_names)}'
         case _:
             print(f'Unknown arg type found: {arg.annotation}')
             return 'UNKNOWN_ARG_TYPE'
 
 
-def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str]):
-    return f'<h3 id = "{function.name}">{function.name}({", ".join(get_function_arg_description(k, module_name, function.name, constant_value_to_names) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
+def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str], dict_typing_defs: dict[str, ast.Dict]):
+    return f'<h3 id = "{function.name}">{function.name}({", ".join(get_function_arg_description(k, module_name, function.name, constant_value_to_names, dict_typing_defs) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
            f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
-
-MODULES_DIR = '../KeyboardBinder/modules/keyboardBinder'
-MODULE_FILES = (k for k in listdir(MODULES_DIR) if not k.startswith('_'))
-
-for module_file in MODULE_FILES:
+def generate_module_documentation(module_file: str):
     module_name = module_file[0 : module_file.rindex('.')]
 
     with open(f'{MODULES_DIR}/{module_file}', 'r') as input_file, open(f'docs/pages/modules/{module_name.lower()}.html', 'w') as output_file:
         module_node = ast.parse(input_file.read())
         module_child_nodes = list(ast.iter_child_nodes(module_node))
+        is_dict_typedef = lambda k: isinstance(k, ast.Assign) and k.targets[0].id.startswith('__') and not k.targets[0].id == '__INTEGRATION' and k.value.func.id == '__TypedDict'  # type: ignore
 
         constant_defs = ( k for k in module_child_nodes if isinstance(k, ast.Assign) and not k.targets[0].id.startswith('__'))  # type: ignore
+        dict_typing_defs = dict((k.targets[0].id, k.value.args[1]) for k in module_child_nodes if is_dict_typedef(k))  # type: ignore
         function_defs = [ k for k in module_child_nodes if isinstance(k, ast.FunctionDef) and not k.name.startswith('__') ]
         function_defs.sort(key = lambda k: k.name)
 
@@ -162,7 +168,7 @@ for module_file in MODULE_FILES:
         constant_groups = dict((k, list(v)) for k, v in groupby(constant_names, key = lambda k: k[0 : k.index('_')]))
 
         constant_group_descriptions = [ f'<h3>{" | ".join(group_items)}</h3>' for _, group_items in constant_groups.items() ]
-        function_descriptions = [ get_function_description(k, module_name, constant_value_to_names) for k in function_defs if not is_overload_function_template(k, function_defs) ]
+        function_descriptions = [ get_function_description(k, module_name, constant_value_to_names, dict_typing_defs) for k in function_defs if not is_overload_function_template(k, function_defs) ]
         module_import_text = '<p class = "code-example">' + \
                                '<span style="color: var(--keyword-color)">from </span>' + \
                                '<span style="color: var(--module-name-color)">keyboardBinder </span>' + \
@@ -178,3 +184,12 @@ for module_file in MODULE_FILES:
                           ('<br>' if len(constant_group_descriptions) > 0 else '') +
                           ('<h2>Functions</h2><hr>\n' if len(function_descriptions) > 0 else '') +
                            '<hr>\n'.join(function_descriptions))
+
+
+generate_module_documentation('Application.py')
+generate_module_documentation('Desktop.py')
+generate_module_documentation('Keyboard.py')
+generate_module_documentation('Mouse.py')
+generate_module_documentation('OBS.py')
+generate_module_documentation('PremierePro.py')
+generate_module_documentation('Twitch.py')

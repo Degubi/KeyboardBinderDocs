@@ -59,8 +59,9 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('PremierePro', 'set_speed_on_selection', _): return { 'value': 42 }
         case ('PremierePro', 'is_track_targeted', _): return { 'track_name': 'Video 1' }
         case ('PremierePro', 'set_track_targeted', _): return { 'track_name': 'Video 1', 'targeted': True }
-        case ('PremierePro', 'add_audio_effect_to_selection', _): return { 'effect_name': 'Bass' }
-        case ('PremierePro', 'add_video_effect_to_selection', _): return { 'effect_name': 'Gamma Correction' }
+        case ('PremierePro', 'add_audio_effect_to_selection', _): return { 'effect_name': 'Unknown', 'properties': '{}' }
+        case ('PremierePro', 'add_video_effect_to_selection', 'Sharpen'): return { 'effect_name': 'Sharpen', 'properties': '{}' }
+        case ('PremierePro', 'add_video_effect_to_selection', _): return { 'effect_name': 'Unknown', 'properties': '{}' }
         case ('PremierePro', 'insert_item_at_player_position', _): return { 'item_path': 'Bin1/Bin2/ClipOrSequenceName' }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
         case _: return {}

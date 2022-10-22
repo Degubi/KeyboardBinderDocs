@@ -36,11 +36,11 @@ function showPage(pagePath) {
 
     if(pagePath !== currentPage) {
         window.history.pushState(currentPage, null, `?page=${pagePath}`);
+        currentPage = pagePath;
+        return forceShowPage(pagePath);
     }
 
-    currentPage = pagePath;
-
-    return forceShowPage(pagePath);
+    return null;
 }
 
 
