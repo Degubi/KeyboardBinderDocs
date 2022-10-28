@@ -1,5 +1,6 @@
 body {
     --number-literal-color: #a7ffa4;
+    --comment-color: #5f965d;
     --string-literal-color: #ce834a;
     --boolean-literal-color: #3f9cd6;
     --module-name-color : #3ac990;

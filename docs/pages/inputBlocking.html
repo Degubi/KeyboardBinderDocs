@@ -8,19 +8,12 @@
 <p>
     To start blocking an application's keyboard input use the 'block_keyboard_input' function found in the 'Application' module, like so:
 </p>
-<p class = "code-example"><span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--function-name-color)">block_keyboard_input</span>(<span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--constant-literal-color)">APP_PREMIERE_PRO</span>)</p>
+<p class = "code-example"><span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--function-name-color)">block_keyboard_input</span>(<span style="color: var(--string-literal-color)">'Premiere Pro'</span>)</p>
 <p>
-    This code blocks the keyboard input in Premiere Pro. The keyboard which input gets blocked is the current profile's keyboard.
+    This code blocks the keyboard input in Premiere Pro. The keyboard which input gets blocked is the current profile's keyboard.<br><br>
+    Note: you have to call this function once per session, so calling it on profile activation is a perfect place.
 </p>
-<h2>Notes</h2>
-<p>
-    It is worth noting that you only need to call 'block_keyboard_input' once, not before every keypress.<br>
-    For this reason it makes sense to put these calls in the profile's 'on_activate' event function, like this:
-</p>
-<p class = "code-example">
-    <span style = "color: var(--keyword-color)">def </span><span style = "color: var(--function-name-color)">on_activate</span>():<br>
-    <span style = "color: var(--module-name-color)">&nbsp;&nbsp;&nbsp;&nbsp;Application</span>.<span style = "color: var(--function-name-color)">block_keyboard_input</span>(<span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--constant-literal-color)">APP_PREMIERE_PRO</span>)
-</p>
+<br>
 <h2>Unblocking</h2>
 <p>
     Unblocking is done automatically when the profile gets disabled, or when Keyboard Binder closes.

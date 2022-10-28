@@ -54,6 +54,9 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('OBS', 'set_input_volume', _): return { 'input_name': 'intro-song', 'volume': 12 }
         case ('OBS', 'stop_media_input', _): return { 'media_input_name': 'outro-music' }
         case ('OBS', 'set_input_is_muted', _): return { 'input_name': 'epic-frag-song', 'muted': False }
+        case ('PremierePro', 'apply_audio_preset_to_selection', _): return { 'preset_path': 'Presets/CoolAudio' }
+        case ('PremierePro', 'apply_video_preset_to_selection', _): return { 'preset_path': 'Presets/CoolVideo' }
+        case ('PremierePro', 'import_presets_from_file', _): return { 'file_path': 'C:/Users/User/Documents/Adobe/Premiere Pro/14.0/Profile-User/Effect Presets and Custom Items.prfpset' }
         case ('PremierePro', 'adjust_audio_gain_level_on_selection' | 'set_audio_gain_level_on_selection', _): return { 'level': 5 }
         case ('PremierePro', 'set_scale_to_frame_size_on_selection', _): return { 'enabled': True }
         case ('PremierePro', 'set_speed_on_selection', _): return { 'value': 42 }
