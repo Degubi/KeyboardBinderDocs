@@ -1,7 +1,5 @@
 <h1>Premiere Pro Integration</h1>
-<p>
-    Premiere Pro integration is implemented through a custom extension panel.
-</p>
+<p>Premiere Pro integration is implemented through a custom extension panel</p>
 <br>
 <h2>Extension Setup</h2>
 <p>
@@ -29,20 +27,10 @@
 <br>
 <h2>Presets</h2>
 <p>
-    To start applying presets to your clips first you have to import your presets into Keyboard Binder.<br>
-    To import them first you have to find the path of your presets file (usually found in Documents/Adobe/Premiere Pro/14.0/Profile-Name/Effect Presets and Custom Items.prfpset).<br>
-    This is the default path for presets. With this path you have to call the <a href = "/?page=modules/premierepro#import_presets_from_file">import_presets_from_file</a> function.<br>
-    <br>
-    Note: you have to call this function once per session, so calling it on profile activation is a perfect place.
-</p>
-<p>
-    After importing the presets file they can be applied to the current selection with the <a href = "/?page=modules/premierepro#apply_audio_preset_to_selection">apply_audio_preset_to_selection</a> or the <a href = "/?page=modules/premierepro#apply_video_preset_to_selection">apply_video_preset_to_selection</a> functions.
+    Presets can be applied to the current selection with the <a href = "/?page=modules/premierepro#apply_audio_preset_to_selection">apply_audio_preset_to_selection</a> or the <a href = "/?page=modules/premierepro#apply_video_preset_to_selection">apply_video_preset_to_selection</a> functions.
 </p>
 <p class = "code-example">
     <span style="color: var(--keyword-color)">from </span><span style="color: var(--module-name-color)">keyboardBinder </span><span style="color: var(--keyword-color)">import </span><span style="color: var(--module-name-color)">PremierePro</span>
     <br><br>
-    <span style="color: var(--comment-color)"># Somewhere in profile activation code</span><br>
-    <span style="color: var(--module-name-color)">PremierePro</span>.<span style = "color: var(--function-name-color)">import_presets_from_file</span>(<span style="color: var(--string-literal-color)">'.prfpset file path'</span>)<br><br>
-    <span style="color: var(--comment-color)"># Somewhere else on keypress</span><br>
     <span style="color: var(--module-name-color)">PremierePro</span>.<span style = "color: var(--function-name-color)">apply_video_preset_to_selection</span>(<span style="color: var(--string-literal-color)">'Presets/PresetNameHere'</span>)
 </p>
