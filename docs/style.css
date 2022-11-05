@@ -25,6 +25,10 @@ body {
     border-left: 3px solid gray;
 }
 
+#content a {
+    color: #8ab4f8;
+}
+
 #sidenav {
     width: 15%;
     min-width: 250px;
