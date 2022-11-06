@@ -5,6 +5,7 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('Application', 'is_connected_to_application'): return [ 'is_connected' ]
         case ('Application', 'is_console_enabled'): return [ 'visible' ]
         case ('Application', 'get_active_profiles'): return [ 'active_profile_names' ]
+        case ('Desktop', 'get_selected_file_paths_in_file_browser'): return [ 'file_paths' ]
         case ('Desktop', 'get_master_volume_level'): return [ 'volume_level' ]
         case ('Desktop', 'get_process_volume_level'): return [ 'volume_level' ]
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
@@ -18,6 +19,7 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('OBS', 'get_current_scene_name'): return [ 'scene_name' ]
         case ('OBS', 'get_is_input_muted'): return [ 'is_muted' ]
         case ('OBS', 'get_input_volume'): return [ 'volume' ]
+        case ('VLC', 'get_playlist_items'): return [ 'item_paths' ]
         case _: return []
 
 def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
@@ -66,6 +68,7 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('PremierePro', 'add_video_effect_to_selection', _): return { 'effect_name': 'Unknown', 'properties': '{}' }
         case ('PremierePro', 'insert_item_at_player_position', _): return { 'item_path': 'Bin1/Bin2/ClipOrSequenceName' }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
+        case ('VLC', 'add_item_to_playlist', _): return { 'file_path': 'C:/Users/User/Desktop/In Flames/Subterranean/Stand Ablaze.mp3' }
         case _: return {}
 
 def get_lambda_parameter_names(module_name: str, function_name: str, arg_name: str):
