@@ -9,7 +9,7 @@
     <body>
         <div id = "sidenav">
             <button class = "nav-button" onclick = "showPage('about')">Keyboard Binder</button>
-            <button class = "nav-button" onclick = "showPage('applicationConfiguration')">Application Configuration</button>
+            <button class = "nav-button" onclick = "showPage('applicationSettings')">Application Settings</button>
             <button class = "nav-button" onclick = "showPage('userScripting')">User Scripting</button>
             <button class = "nav-button" onclick = "showPage('inputBlocking')">Keyboard Input Blocking</button>
             <button class = "nav-button" onclick = "showPage('interactionRecorder')">Interaction Recorder</button>
@@ -20,7 +20,7 @@
                 <button class = "first-level-dropdown-button" onclick = "showPage('integrations/obs')">OBS</button>
                 <button class = "first-level-dropdown-button" onclick = "showPage('integrations/vlc')">VLC</button>
             </div>
-            <button class = "nav-button" onclick = "toggleDropdownButton(this)">Scripting Modules</button>
+            <button class = "nav-button" onclick = "toggleDropdownButton(this)">Builtin Modules</button>
             <div class = "dropdown-container">
                 <module-dropdown-button module-page-path = "modules/application" module-label = "Application"></module-dropdown-button>
                 <module-dropdown-button module-page-path = "modules/desktop" module-label = "Desktop"></module-dropdown-button>
