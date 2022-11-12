@@ -1,5 +1,4 @@
 import http.server
-import socketserver
 
 http.server.SimpleHTTPRequestHandler.extensions_map = {
     '.html': 'text/html',
@@ -21,5 +20,5 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.path = 'index.html'
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
-with socketserver.TCPServer(('', 8080), MyHttpRequestHandler) as httpd:
-    httpd.serve_forever()
+with http.server.HTTPServer(('', 8080), MyHttpRequestHandler) as server:
+    server.serve_forever()

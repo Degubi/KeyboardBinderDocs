@@ -1,6 +1,6 @@
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
-        case ('Application', 'block_keyboard_input'): return [ 'blocking_successful' ]
+        case ('Application', 'block_process_keyboard_input'): return [ 'blocking_successful' ]
         case ('Application', 'connect_to_application'): return [ 'connection_successful' ]
         case ('Application', 'is_connected_to_application'): return [ 'is_connected' ]
         case ('Application', 'is_console_enabled'): return [ 'visible' ]
@@ -15,7 +15,7 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('PremierePro', 'get_scale_to_frame_size_from_selection'): return [ 'scale_enabled' ]
         case ('PremierePro', 'get_speed_from_selection'): return [ 'speed' ]
         case ('PremierePro', 'is_track_targeted'): return [ 'is_targeted' ]
-        case ('Keyboard', 'is_alt_key_down' | 'is_ctrl_key_down' | 'is_shift_key_down'): return [ 'is_down' ]
+        case ('Keyboard', 'is_modifier_key_down'): return [ 'is_down' ]
         case ('OBS', 'get_current_scene_name'): return [ 'scene_name' ]
         case ('OBS', 'get_is_input_muted'): return [ 'is_muted' ]
         case ('OBS', 'get_input_volume'): return [ 'volume' ]
@@ -24,7 +24,7 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
 
 def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
     match(module_name, function_name, overload_name):
-        case ('Application', 'block_keyboard_input', _): return { 'app_name': 'Premiere Pro' }
+        case ('Application', 'block_process_keyboard_input', _): return { 'process_name': 'notepad++.exe' }
         case ('Application', 'connect_to_application', _): return { 'app_name': 'Premiere Pro' }
         case ('Application', 'disconnect_from_application', _): return { 'app_name': 'Premiere Pro' }
         case ('Application', 'is_connected_to_application', _): return { 'app_name': 'Premiere Pro' }
@@ -37,7 +37,7 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Desktop', 'set_master_volume_level', _): return { 'value': 50 }
         case ('Desktop', 'set_process_volume_level', _): return { 'value': 50, 'process_name': 'ts3client_win64.exe' }
         case ('Desktop', 'move_file_to_trash', _): return { 'file_path': 'pic_of_ex.png' }
-        case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key', _): return { 'modifiers': 1 }
+        case ('Keyboard', 'hold_modifier_key' | 'release_modifier_key' | 'is_modifier_key_down', _): return { 'modifiers': 1 }
         case ('Keyboard', 'type', _): return { 'text': 'hi team' }
         case ('Keyboard', 'while_holding_modifier_key', _): return { 'modifiers': 2, 'action': 'lambda: Keyboard.type(\'S\')' }
         case ('Mouse', 'click', _): return { 'button': 1024 }

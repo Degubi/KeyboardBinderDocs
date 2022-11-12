@@ -3,14 +3,15 @@
     It can be useful to block the normal keyboard inputs when pressing keys that run scripts.<br>
     Keyboard Binder uses selective input blocking, which means you have to manually block keyboard inputs in processes.<br>
     <br>
-    The reasoning for this is that some similar programs that use automatic input blocking causes most games to get the user banned because of the nature of keyboard input blocking.
+    The reasoning for this is that some similar programs that use automatic input blocking causes most games to get the user banned because of the nature of keyboard input blocking.<br>
+    This of course implies that blocking keyboard input in games is a bad idea because of the high chance of getting banned!
 </p>
 <br>
 <h2>Blocking</h2>
 <p>
-    To start blocking an application's keyboard input use the 'block_keyboard_input' function found in the 'Application' module, like so:
+    To start blocking an application's keyboard input use the 'block_process_keyboard_input' function found in the 'Application' module, like so:
 </p>
-<p class = "code-example"><span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--function-name-color)">block_keyboard_input</span>(<span style="color: var(--string-literal-color)">'Premiere Pro'</span>)</p>
+<p class = "code-example"><span style = "color: var(--module-name-color)">Application</span>.<span style = "color: var(--function-name-color)">block_process_keyboard_input</span>(<span style="color: var(--string-literal-color)">'Adobe Premiere Pro.exe'</span>)</p>
 <p>
     This code blocks the keyboard input in Premiere Pro. The keyboard which input gets blocked is the current profile's keyboard.<br><br>
     Note: you have to call this function once per session, so calling it on profile activation is a perfect place.

@@ -187,6 +187,7 @@ def generate_module_documentation(module_file: str):
 
 
 generate_module_documentation('Application.py')
+generate_module_documentation('Blender.py')
 generate_module_documentation('Desktop.py')
 generate_module_documentation('Keyboard.py')
 generate_module_documentation('Mouse.py')

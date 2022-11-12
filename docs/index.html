@@ -13,7 +13,7 @@
             <button class = "nav-button" onclick = "showPage('userScripting')">User Scripting</button>
             <button class = "nav-button" onclick = "showPage('inputBlocking')">Keyboard Input Blocking</button>
             <button class = "nav-button" onclick = "showPage('interactionRecorder')">Interaction Recorder</button>
-            <button class = "nav-button" onclick = "toggleDropdownButton(this)">Application Integrations</button>
+            <button class = "nav-button" onclick = "toggleDropdownButton(this)">Integration Examples</button>
             <div class = "dropdown-container">
                 <button class = "first-level-dropdown-button" onclick = "showPage('integrations/desktop')">Desktop</button>
                 <button class = "first-level-dropdown-button" onclick = "showPage('integrations/premierepro')">Premiere Pro</button>
@@ -23,6 +23,7 @@
             <button class = "nav-button" onclick = "toggleDropdownButton(this)">Builtin Modules</button>
             <div class = "dropdown-container">
                 <module-dropdown-button module-page-path = "modules/application" module-label = "Application"></module-dropdown-button>
+                <module-dropdown-button module-page-path = "modules/blender" module-label = "Blender"></module-dropdown-button>
                 <module-dropdown-button module-page-path = "modules/desktop" module-label = "Desktop"></module-dropdown-button>
                 <module-dropdown-button module-page-path = "modules/keyboard" module-label = "Keyboard"></module-dropdown-button>
                 <module-dropdown-button module-page-path = "modules/mouse" module-label = "Mouse"></module-dropdown-button>
