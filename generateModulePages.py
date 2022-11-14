@@ -147,7 +147,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, function_name: 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str], dict_typing_defs: dict[str, ast.Dict]):
     return f'<h3 id = "{function.name}">{function.name}({", ".join(get_function_arg_description(k, module_name, function.name, constant_value_to_names, dict_typing_defs) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
-           f'</p><h4>Example:</h4><p class = "code-example">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
+           f'</p><h4>Example:</h4><p class = "code-example-block">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
 
 def generate_module_documentation(module_file: str):
     module_name = module_file[0 : module_file.rindex('.')]
@@ -169,7 +169,7 @@ def generate_module_documentation(module_file: str):
 
         constant_group_descriptions = [ f'<h3>{" | ".join(group_items)}</h3>' for _, group_items in constant_groups.items() ]
         function_descriptions = [ get_function_description(k, module_name, constant_value_to_names, dict_typing_defs) for k in function_defs if not is_overload_function_template(k, function_defs) ]
-        module_import_text = '<p class = "code-example">' + \
+        module_import_text = '<p class = "code-example-block">' + \
                                '<span style="color: var(--keyword-color)">from </span>' + \
                                '<span style="color: var(--module-name-color)">keyboardBinder </span>' + \
                                '<span style="color: var(--keyword-color)">import </span>' + \

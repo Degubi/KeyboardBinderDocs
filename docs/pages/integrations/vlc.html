@@ -12,3 +12,33 @@
         <li>Set the same password in Keyboard Binder's integration settings</li>
     </ul>
 </p>
+<br>
+<h2>Controlling Playback</h2>
+<p>
+    In VLC there are 3 playback states: Playing, Paused, Stopped.<br>
+    To switch between these states there are 4 functions to do so:
+</p>
+<p class = "code-example-block">
+    <span style="color: var(--keyword-color)">from </span><span style="color: var(--module-name-color)">keyboardBinder </span><span style="color: var(--keyword-color)">import </span><span style="color: var(--module-name-color)">VLC</span>
+    <br><br>
+    <span style = "color: var(--comment-color)"># to start playing the current playlist item</span><br>
+    <span style="color: var(--module-name-color)">VLC</span>.<span style = "color: var(--function-name-color)">start_playback</span>()<br><br>
+    <span style = "color: var(--comment-color)"># to pause playing the current playlist item</span><br>
+    <span style="color: var(--module-name-color)">VLC</span>.<span style = "color: var(--function-name-color)">pause_playback</span>()<br><br>
+    <span style = "color: var(--comment-color)"># to resume playing the current playlist item</span><br>
+    <span style="color: var(--module-name-color)">VLC</span>.<span style = "color: var(--function-name-color)">resume_playback</span>()<br><br>
+    <span style = "color: var(--comment-color)"># to stop playing the current playlist item</span><br>
+    <span style="color: var(--module-name-color)">VLC</span>.<span style = "color: var(--function-name-color)">stop_playback</span>()
+</p>
+<br>
+<h2>Controlling The Playlist</h2>
+<p>
+    VLC uses a single playlist as the item queue for playback.<br>
+    You can check this in VLC by right clicking and checking out the 'Playlist' menu.<br>
+    For controlling the playlist there are several functions:
+</p>
+<p class = "code-example-block">
+    <span style="color: var(--keyword-color)">from </span><span style="color: var(--module-name-color)">keyboardBinder </span><span style="color: var(--keyword-color)">import </span><span style="color: var(--module-name-color)">VLC</span>
+    <br><br>
+    TODO
+</p>

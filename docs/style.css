@@ -78,10 +78,16 @@ body {
     background-color: #262626;
 }
 
-.code-example {
+.code-example-block {
     display: inline-block;
     background-color: #262626;
     border: solid 1px #4b4b4b;
     padding: 5px;
     margin: 0px 0px 15px 0px;
+}
+
+.about-integration-label {
+    left: 8px;
+    top:-8px;
+    position: relative;
 }
