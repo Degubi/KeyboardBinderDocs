@@ -19,16 +19,16 @@
     To switch between these states there are 4 functions to do so:
 </p>
 <p class = "code-example-block">
-    <span style="color: var(--keyword-color)">from </span><span style="color: var(--module-name-color)">keyboardBinder </span><span style="color: var(--keyword-color)">import </span><span style="color: var(--module-name-color)">VLC</span>
+    <python-keyword>from </python-keyword><python-module>keyboardBinder </python-module><python-keyword>import </python-keyword><python-module>VLC</python-module>
     <br><br>
-    <span style = "color: var(--comment-color)"># to start playing the current playlist item</span><br>
-    <span style="color: var(--module-name-color)">VLC</span>.<span style = "color: var(--function-name-color)">start_playback</span>()<br><br>
-    <span style = "color: var(--comment-color)"># to pause playing the current playlist item</span><br>
-    <span style="color: var(--module-name-color)">VLC</span>.<span style = "color: var(--function-name-color)">pause_playback</span>()<br><br>
-    <span style = "color: var(--comment-color)"># to resume playing the current playlist item</span><br>
-    <span style="color: var(--module-name-color)">VLC</span>.<span style = "color: var(--function-name-color)">resume_playback</span>()<br><br>
-    <span style = "color: var(--comment-color)"># to stop playing the current playlist item</span><br>
-    <span style="color: var(--module-name-color)">VLC</span>.<span style = "color: var(--function-name-color)">stop_playback</span>()
+    <python-comment># to start playing the current playlist item</python-comment><br>
+    <python-module>VLC</python-module>.<python-function>start_playback</python-function>()<br><br>
+    <python-comment># to pause playing the current playlist item</python-comment><br>
+    <python-module>VLC</python-module>.<python-function>pause_playback</python-function>()<br><br>
+    <python-comment># to resume playing the current playlist item</python-comment><br>
+    <python-module>VLC</python-module>.<python-function>resume_playback</python-function>()<br><br>
+    <python-comment># to stop playing the current playlist item</python-comment><br>
+    <python-module>VLC</python-module>.<python-function>stop_playback</python-function>()
 </p>
 <br>
 <h2>Controlling The Playlist</h2>
@@ -38,7 +38,15 @@
     For controlling the playlist there are several functions:
 </p>
 <p class = "code-example-block">
-    <span style="color: var(--keyword-color)">from </span><span style="color: var(--module-name-color)">keyboardBinder </span><span style="color: var(--keyword-color)">import </span><span style="color: var(--module-name-color)">VLC</span>
-    <br><br>
-    TODO
+    <python-keyword>from </python-keyword><python-module>keyboardBinder </python-module><python-keyword>import </python-keyword><python-module>VLC</python-module><br>
+    <br>
+    <python-comment># navigate playlist</python-comment><br>
+    <python-module>VLC</python-module>.<python-function>jump_to_previous_playlist_item</python-function>()<br>
+    <python-module>VLC</python-module>.<python-function>jump_to_next_playlist_item</python-function>()<br>
+    <br>
+    <python-comment># query playlist</python-comment><br>
+    playlist_item_paths = <python-module>VLC</python-module>.<python-function>get_playlist_items</python-function>()<br>
+    <br>
+    <python-comment># update playlist</python-comment><br>
+    <python-module>VLC</python-module>.<python-function>add_item_to_playlist</python-function>(<python-string>'Path to mp3 file'</python-string>)<br>
 </p>

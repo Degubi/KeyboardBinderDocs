@@ -1,13 +1,4 @@
 body {
-    --number-literal-color: #a7ffa4;
-    --comment-color: #5f965d;
-    --string-literal-color: #ce834a;
-    --boolean-literal-color: #3f9cd6;
-    --module-name-color : #3ac990;
-    --keyword-color: #c842d1;
-    --function-name-color: #dcdc9d;
-    --constant-literal-color: #44c1f1;
-
     margin: 0;
     font-family: Arial;
     display: flex;
@@ -58,19 +49,25 @@ body {
     background-color: #4b4b4b;
 }
 
+.nav-section {
+    font-size: 18px;
+    color: lightgreen;
+    padding: 8px 8px 8px 16px;
+}
+
 .nav-button {
-    font-size: 20px;
+    font-size: 16px;
     padding: 8px 8px 8px 16px;
 }
 
 .first-level-dropdown-button {
-    font-size: 18px;
+    font-size: 14px;
     padding: 8px 8px 8px 24px;
 }
 
 .second-level-dropdown-button {
     padding: 4px 8px 4px 32px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .dropdown-container {

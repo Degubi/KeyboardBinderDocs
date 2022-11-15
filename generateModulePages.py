@@ -45,13 +45,13 @@ def syntax_highlight_python_function_call(code: str):
         after_part = code[arg.end_col_offset : ]
 
         match arg:
-            case ast.Constant(builtins.bool(value)):  return f'{before_part}<span style = "color: var(--boolean-literal-color)">{value}</span>{after_part}'
-            case ast.Constant(builtins.str(value)):   return f'{before_part}<span style = "color: var(--string-literal-color)">\'{value}\'</span>{after_part}'
-            case ast.Constant(builtins.int(value)):   return f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
-            case ast.Constant(builtins.float(value)): return f'{before_part}<span style = "color: var(--number-literal-color)">{value}</span>{after_part}'
-            case ast.Attribute(ast.Name(module), constant): return f'{before_part}<span style = "color: var(--module-name-color)">{module}</span>.' + \
-                                                                   f'<span style = "color: var(--constant-literal-color)">{constant}</span>{after_part}'
-            case ast.Lambda(args, body): return f'{before_part}<span style = "color: var(--boolean-literal-color)">lambda</span>' + \
+            case ast.Constant(builtins.bool(value)):  return f'{before_part}<python-boolean>{value}</python-boolean>{after_part}'
+            case ast.Constant(builtins.str(value)):   return f'{before_part}<python-string>\'{value}\'</python-string>{after_part}'
+            case ast.Constant(builtins.int(value)):   return f'{before_part}<python-number>{value}</python-number>{after_part}'
+            case ast.Constant(builtins.float(value)): return f'{before_part}<python-number>{value}</python-number>{after_part}'
+            case ast.Attribute(ast.Name(module), constant): return f'{before_part}<python-module>{module}</python-module>.' + \
+                                                                   f'<python-constant>{constant}</python-constant>{after_part}'
+            case ast.Lambda(args, body): return f'{before_part}<python-boolean>lambda</python-boolean>' + \
                                                 f'{(" " if len(args.args) > 0 else "") + ", ".join(k.arg for k in args.args)}: {syntax_highlight_python_function_call(code[body.col_offset : -1])})'
             case _:
                 print(f'Unknown arg type found: {arg}')
@@ -71,12 +71,12 @@ def syntax_highlight_python_function_call(code: str):
         function_call_func_attr: ast.Attribute = function_call_ast.func  # type: ignore
         function_call_module: ast.Name = function_call_func_attr.value  # type: ignore
 
-        code = f'{code[0 : function_call_func_attr.col_offset]}<span style = "color: var(--module-name-color)">{function_call_module.id}</span>.' + \
-               f'<span style = "color: var(--function-name-color)">{function_call_func_attr.attr}</span>{code[function_call_func_attr.end_col_offset : ]}'
+        code = f'{code[0 : function_call_func_attr.col_offset]}<python-module>{function_call_module.id}</python-module>.' + \
+               f'<python-function>{function_call_func_attr.attr}</python-function>{code[function_call_func_attr.end_col_offset : ]}'
     elif function_call_type == ast.Name:
         function_call_func: ast.Name = function_call_ast.func  # type: ignore
 
-        code = f'<span style = "color: var(--function-name-color)">{function_call_func.id}</span>{code[function_call_func.end_col_offset : ]}'
+        code = f'<python-function>{function_call_func.id}</python-function>{code[function_call_func.end_col_offset : ]}'
 
     return code
 
@@ -170,10 +170,10 @@ def generate_module_documentation(module_file: str):
         constant_group_descriptions = [ f'<h3>{" | ".join(group_items)}</h3>' for _, group_items in constant_groups.items() ]
         function_descriptions = [ get_function_description(k, module_name, constant_value_to_names, dict_typing_defs) for k in function_defs if not is_overload_function_template(k, function_defs) ]
         module_import_text = '<p class = "code-example-block">' + \
-                               '<span style="color: var(--keyword-color)">from </span>' + \
-                               '<span style="color: var(--module-name-color)">keyboardBinder </span>' + \
-                               '<span style="color: var(--keyword-color)">import </span>' + \
-                              f'<span style="color: var(--module-name-color)">{module_name}</span>' + \
+                               '<python-keyword>from </python-keyword>' + \
+                               '<python-module>keyboardBinder </python-module>' + \
+                               '<python-keyword>import </python-keyword>' + \
+                              f'<python-module>{module_name}</python-module>' + \
                              '</p>'
 
         output_file.write(f'<h1>{module_name} module</h1>\n' +

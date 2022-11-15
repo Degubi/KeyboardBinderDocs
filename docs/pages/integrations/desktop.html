@@ -6,15 +6,15 @@
     There are separate functions for getting/setting master or per process volume values:
 </p>
 <p class = "code-example-block">
-    <span style="color: var(--keyword-color)">from </span><span style="color: var(--module-name-color)">keyboardBinder </span><span style="color: var(--keyword-color)">import </span><span style="color: var(--module-name-color)">Desktop</span><br>
+    <python-keyword>from </python-keyword><python-module>keyboardBinder </python-module><python-keyword>import </python-keyword><python-module>Desktop</python-module><br>
     <br>
-    <span style = "color: var(--comment-color)"># increase master volume level by 10%</span><br>
+    <python-comment># increase master volume level by 10%</python-comment><br>
     <br>
-    master_volume_level_percentage = <span style="color: var(--module-name-color)">Desktop</span>.<span style = "color: var(--function-name-color)">get_master_volume_level</span>()<br>
-    <span style="color: var(--module-name-color)">Desktop</span>.<span style = "color: var(--function-name-color)">set_master_volume_level</span>(master_volume_level_percentage + <span style = "color: var(--number-literal-color)">10</span>)<br>
+    master_volume_level_percentage = <python-module>Desktop</python-module>.<python-function>get_master_volume_level</python-function>()<br>
+    <python-module>Desktop</python-module>.<python-function>set_master_volume_level</python-function>(master_volume_level_percentage + <python-number>10</python-number>)<br>
     <br>
-    <span style = "color: var(--comment-color)"># decrease chrome's volume level by 5%</span><br>
+    <python-comment># decrease chrome's volume level by 5%</python-comment><br>
     <br>
-    chrome_volume_level_percentage = <span style="color: var(--module-name-color)">Desktop</span>.<span style = "color: var(--function-name-color)">get_process_volume_level</span>(<span style = "color: var(--string-literal-color)">'chrome.exe'</span>)<br>
-    <span style="color: var(--module-name-color)">Desktop</span>.<span style = "color: var(--function-name-color)">set_process_volume_level</span>(<span style = "color: var(--string-literal-color)">'chrome.exe'</span>, chrome_volume_level_percentage - <span style = "color: var(--number-literal-color)">5</span>)<br>
+    chrome_volume_level_percentage = <python-module>Desktop</python-module>.<python-function>get_process_volume_level</python-function>(<python-string>'chrome.exe'</python-string>)<br>
+    <python-module>Desktop</python-module>.<python-function>set_process_volume_level</python-function>(<python-string>'chrome.exe'</python-string>, chrome_volume_level_percentage - <python-number>5</python-number>)<br>
 </p>
