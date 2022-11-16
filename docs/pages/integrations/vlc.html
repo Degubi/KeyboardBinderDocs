@@ -25,10 +25,16 @@
     <python-module>VLC</python-module>.<python-function>start_playback</python-function>()<br><br>
     <python-comment># to pause playing the current playlist item</python-comment><br>
     <python-module>VLC</python-module>.<python-function>pause_playback</python-function>()<br><br>
-    <python-comment># to resume playing the current playlist item</python-comment><br>
-    <python-module>VLC</python-module>.<python-function>resume_playback</python-function>()<br><br>
     <python-comment># to stop playing the current playlist item</python-comment><br>
     <python-module>VLC</python-module>.<python-function>stop_playback</python-function>()
+</p>
+<br>
+<h2>Controlling Player Volume</h2>
+<p class = "code-example-block">
+    <python-keyword>from </python-keyword><python-module>keyboardBinder </python-module><python-keyword>import </python-keyword><python-module>VLC</python-module>
+    <br><br>
+    <python-comment># increase player volume by 15%</python-comment><br>
+    <python-module>VLC</python-module>.<python-function>set_player_volume</python-function>(<python-module>VLC</python-module>.<python-function>get_player_volume</python-function>() + <python-number>15</python-number>)<br>
 </p>
 <br>
 <h2>Controlling The Playlist</h2>
