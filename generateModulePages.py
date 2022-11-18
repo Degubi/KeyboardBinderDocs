@@ -45,13 +45,13 @@ def syntax_highlight_python_function_call(code: str):
         after_part = code[arg.end_col_offset : ]
 
         match arg:
-            case ast.Constant(builtins.bool(value)):  return f'{before_part}<python-boolean>{value}</python-boolean>{after_part}'
-            case ast.Constant(builtins.str(value)):   return f'{before_part}<python-string>\'{value}\'</python-string>{after_part}'
-            case ast.Constant(builtins.int(value)):   return f'{before_part}<python-number>{value}</python-number>{after_part}'
-            case ast.Constant(builtins.float(value)): return f'{before_part}<python-number>{value}</python-number>{after_part}'
-            case ast.Attribute(ast.Name(module), constant): return f'{before_part}<python-module>{module}</python-module>.' + \
-                                                                   f'<python-constant>{constant}</python-constant>{after_part}'
-            case ast.Lambda(args, body): return f'{before_part}<python-boolean>lambda</python-boolean>' + \
+            case ast.Constant(builtins.bool(value)):  return f'{before_part}<py-boolean>{value}</py-boolean>{after_part}'
+            case ast.Constant(builtins.str(value)):   return f'{before_part}<py-string>\'{value}\'</py-string>{after_part}'
+            case ast.Constant(builtins.int(value)):   return f'{before_part}<py-number>{value}</py-number>{after_part}'
+            case ast.Constant(builtins.float(value)): return f'{before_part}<py-number>{value}</py-number>{after_part}'
+            case ast.Attribute(ast.Name(module), constant): return f'{before_part}<py-module>{module}</py-module>.' + \
+                                                                   f'<py-constant>{constant}</py-constant>{after_part}'
+            case ast.Lambda(args, body): return f'{before_part}<py-boolean>lambda</py-boolean>' + \
                                                 f'{(" " if len(args.args) > 0 else "") + ", ".join(k.arg for k in args.args)}: {syntax_highlight_python_function_call(code[body.col_offset : -1])})'
             case _:
                 print(f'Unknown arg type found: {arg}')
@@ -71,12 +71,12 @@ def syntax_highlight_python_function_call(code: str):
         function_call_func_attr: ast.Attribute = function_call_ast.func  # type: ignore
         function_call_module: ast.Name = function_call_func_attr.value  # type: ignore
 
-        code = f'{code[0 : function_call_func_attr.col_offset]}<python-module>{function_call_module.id}</python-module>.' + \
-               f'<python-function>{function_call_func_attr.attr}</python-function>{code[function_call_func_attr.end_col_offset : ]}'
+        code = f'{code[0 : function_call_func_attr.col_offset]}<py-module>{function_call_module.id}</py-module>.' + \
+               f'<py-function>{function_call_func_attr.attr}</py-function>{code[function_call_func_attr.end_col_offset : ]}'
     elif function_call_type == ast.Name:
         function_call_func: ast.Name = function_call_ast.func  # type: ignore
 
-        code = f'<python-function>{function_call_func.id}</python-function>{code[function_call_func.end_col_offset : ]}'
+        code = f'<py-function>{function_call_func.id}</py-function>{code[function_call_func.end_col_offset : ]}'
 
     return code
 
@@ -147,7 +147,7 @@ def get_function_arg_description(arg: ast.arg, module_name: str, function_name: 
 def get_function_description(function: ast.FunctionDef, module_name: str, constant_value_to_names: dict[Any, str], dict_typing_defs: dict[str, ast.Dict]):
     return f'<h3 id = "{function.name}">{function.name}({", ".join(get_function_arg_description(k, module_name, function.name, constant_value_to_names, dict_typing_defs) for k in function.args.args)}) -> {get_function_return_type(function)}</h3>' + \
            f'<h4>Description:</h4><p>{ast.get_docstring(function) or "MISSING_FUNCTION_DESCRIPTION"}' + \
-           f'</p><h4>Example:</h4><p class = "code-example-block">{get_function_call_example(function, module_name, constant_value_to_names)}</p>'
+           f'</p><h4>Example:</h4><div class="code-example-block">{get_function_call_example(function, module_name, constant_value_to_names)}</div>'
 
 def generate_module_documentation(module_file: str):
     module_name = module_file[0 : module_file.rindex('.')]
@@ -169,12 +169,12 @@ def generate_module_documentation(module_file: str):
 
         constant_group_descriptions = [ f'<h3>{" | ".join(group_items)}</h3>' for _, group_items in constant_groups.items() ]
         function_descriptions = [ get_function_description(k, module_name, constant_value_to_names, dict_typing_defs) for k in function_defs if not is_overload_function_template(k, function_defs) ]
-        module_import_text = '<p class = "code-example-block">' + \
-                               '<python-keyword>from </python-keyword>' + \
-                               '<python-module>keyboardBinder </python-module>' + \
-                               '<python-keyword>import </python-keyword>' + \
-                              f'<python-module>{module_name}</python-module>' + \
-                             '</p>'
+        module_import_text = '<div class = "code-example-block">' + \
+                               '<py-keyword>from </py-keyword>' + \
+                               '<py-module>keyboardBinder </py-module>' + \
+                               '<py-keyword>import </py-keyword>' + \
+                              f'<py-module>{module_name}</py-module>' + \
+                             '</div>'
 
         output_file.write(f'<h1>{module_name} module</h1>\n' +
                           f'<p>{ast.get_docstring(module_node)}</p><br>\n' +

@@ -8,6 +8,7 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('Desktop', 'get_selected_file_paths_in_file_browser'): return [ 'file_paths' ]
         case ('Desktop', 'get_master_volume_level'): return [ 'volume_level' ]
         case ('Desktop', 'get_process_volume_level'): return [ 'volume_level' ]
+        case ('Desktop', 'get_clipboard_text'): return [ 'clipboard_text' ]
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
         case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
         case ('PremierePro', 'get_audio_gain_level_from_selection'): return [ 'gain_level' ]
@@ -35,7 +36,7 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Application', 'set_console_visible', _): return { 'visible': True }
         case ('Application', 'start_interaction_recorder', _): return { 'result_consumer': 'lambda result: print(\'Use result here\')' }
         case ('Application', 'wait', _): return { 'seconds': 3.5 }
-        case ('Desktop', 'copy_text_to_clipboard', _): return { 'text': 'epic text' }
+        case ('Desktop', 'set_clipboard_text', _): return { 'text': 'epic text' }
         case ('Desktop', 'exec_command', _): return { 'command': 'explorer https://google.com' }
         case ('Desktop', 'get_process_volume_level', _): return { 'process_name': 'ts3client_win64.exe' }
         case ('Desktop', 'set_master_volume_level', _): return { 'value': 50 }

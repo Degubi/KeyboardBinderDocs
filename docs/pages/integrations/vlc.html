@@ -18,24 +18,24 @@
     In VLC there are 3 playback states: Playing, Paused, Stopped.<br>
     To switch between these states there are 4 functions to do so:
 </p>
-<p class = "code-example-block">
-    <python-keyword>from </python-keyword><python-module>keyboardBinder </python-module><python-keyword>import </python-keyword><python-module>VLC</python-module>
+<div class = "code-example-block">
+    <py-keyword>from </py-keyword><py-module>keyboardBinder </py-module><py-keyword>import </py-keyword><py-module>VLC</py-module>
     <br><br>
-    <python-comment># to start playing the current playlist item</python-comment><br>
-    <python-module>VLC</python-module>.<python-function>start_playback</python-function>()<br><br>
-    <python-comment># to pause playing the current playlist item</python-comment><br>
-    <python-module>VLC</python-module>.<python-function>pause_playback</python-function>()<br><br>
-    <python-comment># to stop playing the current playlist item</python-comment><br>
-    <python-module>VLC</python-module>.<python-function>stop_playback</python-function>()
-</p>
+    <py-comment># to start playing the current playlist item</py-comment><br>
+    <py-module>VLC</py-module>.<py-function>start_playback</py-function>()<br><br>
+    <py-comment># to pause playing the current playlist item</py-comment><br>
+    <py-module>VLC</py-module>.<py-function>pause_playback</py-function>()<br><br>
+    <py-comment># to stop playing the current playlist item</py-comment><br>
+    <py-module>VLC</py-module>.<py-function>stop_playback</py-function>()
+</div>
 <br>
 <h2>Controlling Player Volume</h2>
-<p class = "code-example-block">
-    <python-keyword>from </python-keyword><python-module>keyboardBinder </python-module><python-keyword>import </python-keyword><python-module>VLC</python-module>
+<div class = "code-example-block">
+    <py-keyword>from </py-keyword><py-module>keyboardBinder </py-module><py-keyword>import </py-keyword><py-module>VLC</py-module>
     <br><br>
-    <python-comment># increase player volume by 15%</python-comment><br>
-    <python-module>VLC</python-module>.<python-function>set_player_volume</python-function>(<python-module>VLC</python-module>.<python-function>get_player_volume</python-function>() + <python-number>15</python-number>)<br>
-</p>
+    <py-comment># increase player volume by 15%</py-comment><br>
+    <py-module>VLC</py-module>.<py-function>set_player_volume</py-function>(<py-module>VLC</py-module>.<py-function>get_player_volume</py-function>() + <py-number>15</py-number>)<br>
+</div>
 <br>
 <h2>Controlling The Playlist</h2>
 <p>
@@ -43,16 +43,16 @@
     You can check this in VLC by right clicking and checking out the 'Playlist' menu.<br>
     For controlling the playlist there are several functions:
 </p>
-<p class = "code-example-block">
-    <python-keyword>from </python-keyword><python-module>keyboardBinder </python-module><python-keyword>import </python-keyword><python-module>VLC</python-module><br>
+<div class = "code-example-block">
+    <py-keyword>from </py-keyword><py-module>keyboardBinder </py-module><py-keyword>import </py-keyword><py-module>VLC</py-module><br>
     <br>
-    <python-comment># navigate playlist</python-comment><br>
-    <python-module>VLC</python-module>.<python-function>jump_to_previous_playlist_item</python-function>()<br>
-    <python-module>VLC</python-module>.<python-function>jump_to_next_playlist_item</python-function>()<br>
+    <py-comment># navigate playlist</py-comment><br>
+    <py-module>VLC</py-module>.<py-function>jump_to_previous_playlist_item</py-function>()<br>
+    <py-module>VLC</py-module>.<py-function>jump_to_next_playlist_item</py-function>()<br>
     <br>
-    <python-comment># query playlist</python-comment><br>
-    playlist_item_paths = <python-module>VLC</python-module>.<python-function>get_playlist_items</python-function>()<br>
+    <py-comment># query playlist</py-comment><br>
+    playlist_item_paths = <py-module>VLC</py-module>.<py-function>get_playlist_items</py-function>()<br>
     <br>
-    <python-comment># update playlist</python-comment><br>
-    <python-module>VLC</python-module>.<python-function>add_item_to_playlist</python-function>(<python-string>'Path to mp3 file'</python-string>)<br>
-</p>
+    <py-comment># update playlist</py-comment><br>
+    <py-module>VLC</py-module>.<py-function>add_item_to_playlist</py-function>(<py-string>'Path to mp3 file'</py-string>)<br>
+</div>

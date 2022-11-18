@@ -5,16 +5,33 @@
     In a normal desktop environment there are 2 types of volume values: master system volume & per process volume.<br>
     There are separate functions for getting/setting master or per process volume values:
 </p>
-<p class = "code-example-block">
-    <python-keyword>from </python-keyword><python-module>keyboardBinder </python-module><python-keyword>import </python-keyword><python-module>Desktop</python-module><br>
+<div class = "code-example-block">
+    <py-keyword>from </py-keyword><py-module>keyboardBinder </py-module><py-keyword>import </py-keyword><py-module>Desktop</py-module><br>
     <br>
-    <python-comment># increase master volume level by 10%</python-comment><br>
+    <py-comment># increase master volume level by 10%</py-comment><br>
     <br>
-    master_volume_level_percentage = <python-module>Desktop</python-module>.<python-function>get_master_volume_level</python-function>()<br>
-    <python-module>Desktop</python-module>.<python-function>set_master_volume_level</python-function>(master_volume_level_percentage + <python-number>10</python-number>)<br>
+    master_volume_level_percentage = <py-module>Desktop</py-module>.<py-function>get_master_volume_level</py-function>()<br>
+    <py-module>Desktop</py-module>.<py-function>set_master_volume_level</py-function>(master_volume_level_percentage + <py-number>10</py-number>)<br>
     <br>
-    <python-comment># decrease chrome's volume level by 5%</python-comment><br>
+    <py-comment># decrease chrome's volume level by 5%</py-comment><br>
     <br>
-    chrome_volume_level_percentage = <python-module>Desktop</python-module>.<python-function>get_process_volume_level</python-function>(<python-string>'chrome.exe'</python-string>)<br>
-    <python-module>Desktop</python-module>.<python-function>set_process_volume_level</python-function>(<python-string>'chrome.exe'</python-string>, chrome_volume_level_percentage - <python-number>5</python-number>)<br>
-</p>
+    chrome_volume_level_percentage = <py-module>Desktop</py-module>.<py-function>get_process_volume_level</py-function>(<py-string>'chrome.exe'</py-string>)<br>
+    <py-module>Desktop</py-module>.<py-function>set_process_volume_level</py-function>(<py-string>'chrome.exe'</py-string>, chrome_volume_level_percentage - <py-number>5</py-number>)<br>
+</div>
+<br>
+<h2>Clipboard API</h2>
+<div class = "code-example-block">
+    <py-keyword>from </py-keyword><py-module>keyboardBinder </py-module><py-keyword>import </py-keyword><py-module>Desktop</py-module><br>
+    <br>
+    <py-comment># set clipboard text</py-comment><br>
+    <py-module>Desktop</py-module>.<py-function>set_clipboard_text</py-function>(<py-string>'CSGO'</py-string>)<br>
+    <br>
+    <py-comment># get clipboard text (clipboard_text = 'CSGO')</py-comment><br>
+    clipboard_text = <py-module>Desktop</py-module>.<py-function>get_clipboard_text</py-function>()<br>
+    <br>
+    <py-comment># basically CTRL + C</py-comment><br>
+    <py-module>Desktop</py-module>.<py-function>copy_selection_to_clipboard</py-function>()<br>
+    <br>
+    <py-comment># basically CTRL + V</py-comment><br>
+    <py-module>Desktop</py-module>.<py-function>paste_clipboard_content</py-function>()
+</div>

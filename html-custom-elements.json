@@ -1,20 +1,20 @@
 {
     "version": 1.1,
     "tags": [{
-        "name": "python-comment"
+        "name": "py-comment"
     },{
-        "name": "python-module"
+        "name": "py-module"
     },{
-        "name": "python-keyword"
+        "name": "py-keyword"
     },{
-        "name": "python-function"
+        "name": "py-function"
     },{
-        "name": "python-string"
+        "name": "py-string"
     },{
-        "name": "python-number"
+        "name": "py-number"
     },{
-        "name": "python-boolean"
+        "name": "py-boolean"
     },{
-        "name": "python-constant"
+        "name": "py-constant"
     }]
 }
