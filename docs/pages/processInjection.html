@@ -1,0 +1,37 @@
+<h1>Process Injection</h1>
+<p>
+    Keyboard Binder has the functionality to inject code into processes. Some of the use-cases include:
+</p>
+<ul>
+    <li>Blocking normal keyboard inputs in applications when pressing keys that run scripts</li>
+    <li>Running some code when an application closes</li>
+</ul>
+<br>
+<h2>Notes of Caution</h2>
+<p>
+    In Keyboard Binder process injection is done manually.<br>
+    The reasoning behind this is that some similar programs that e.g automatically block inputs causes most games to get the user banned because of the nature of process injection.<br>
+    This of course implies that this kind of injection in games is a bad idea because of the high chance of getting banned!
+</p>
+<br>
+<h2>Injecting</h2>
+<p>
+    To inject into a process use the 'inject_into_process' function found in the 'KeyboardBinder' module, like so:
+</p>
+<div class = "code-example-block">
+    <py-keyword>from </py-keyword><py-module>keyboardBinder </py-module><py-keyword>import </py-keyword><py-module>KeyboardBinder</py-module><br>
+    <br>
+    <py-module>KeyboardBinder</py-module>.<py-function>inject_into_process</py-function>(<py-string>'Adobe Premiere Pro.exe'</py-string>, <py-boolean>True</py-boolean>, <py-boolean>lambda</py-boolean>: <py-function>print</py-function>(<py-string>'PPro exited!'</py-string>))
+</div>
+<p>
+    This code blocks the keyboard input in Premiere Pro and prints 'PPro exited!' when closing Premiere.<br>
+    The keyboard which input gets blocked is the current profile's keyboard.<br>
+    <br>
+    Note: you have to call this function once per session, so calling it on profile activation is a perfect place.<br>
+    Calling 'inject_into_process' multiple times on the same process is a no-op.
+</p>
+<br>
+<h2>Ejecting</h2>
+<p>
+    Ejecting is done automatically when the profile gets disabled, or when Keyboard Binder closes.
+</p>

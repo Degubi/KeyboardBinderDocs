@@ -1,10 +1,10 @@
 def get_example_return_value_mappings(function_name: str, module_name: str):
     match(module_name, function_name):
-        case ('Application', 'block_process_keyboard_input'): return [ 'blocking_successful' ]
-        case ('Application', 'connect_to_application'): return [ 'connection_successful' ]
-        case ('Application', 'is_connected_to_application'): return [ 'is_connected' ]
-        case ('Application', 'is_console_enabled'): return [ 'visible' ]
-        case ('Application', 'get_active_profiles'): return [ 'active_profile_names' ]
+        case ('KeyboardBinder', 'inject_into_process'): return [ 'injection_successful' ]
+        case ('KeyboardBinder', 'connect_to_application'): return [ 'connection_successful' ]
+        case ('KeyboardBinder', 'is_connected_to_application'): return [ 'is_connected' ]
+        case ('KeyboardBinder', 'is_console_enabled'): return [ 'visible' ]
+        case ('KeyboardBinder', 'get_active_profiles'): return [ 'active_profile_names' ]
         case ('Desktop', 'get_selected_file_paths_in_file_browser'): return [ 'file_paths' ]
         case ('Desktop', 'get_master_volume_level'): return [ 'volume_level' ]
         case ('Desktop', 'get_process_volume_level'): return [ 'volume_level' ]
@@ -29,13 +29,13 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
 
 def get_example_arg_mappings(function_name: str, module_name: str, overload_name: str):
     match(module_name, function_name, overload_name):
-        case ('Application', 'block_process_keyboard_input', _): return { 'process_name': 'notepad++.exe' }
-        case ('Application', 'connect_to_application', _): return { 'app_name': 'Premiere Pro' }
-        case ('Application', 'disconnect_from_application', _): return { 'app_name': 'Premiere Pro' }
-        case ('Application', 'is_connected_to_application', _): return { 'app_name': 'Premiere Pro' }
-        case ('Application', 'set_console_visible', _): return { 'visible': True }
-        case ('Application', 'start_interaction_recorder', _): return { 'result_consumer': 'lambda result: print(\'Use result here\')' }
-        case ('Application', 'wait', _): return { 'seconds': 3.5 }
+        case ('KeyboardBinder', 'inject_into_process', _): return { 'process_name': 'notepad++.exe', 'block_keyboard_input': True, 'on_process_exit': 'lambda result: print(\'Process exited!\')' }
+        case ('KeyboardBinder', 'connect_to_application', _): return { 'app_name': 'Premiere Pro' }
+        case ('KeyboardBinder', 'disconnect_from_application', _): return { 'app_name': 'Premiere Pro' }
+        case ('KeyboardBinder', 'is_connected_to_application', _): return { 'app_name': 'Premiere Pro' }
+        case ('KeyboardBinder', 'set_console_visible', _): return { 'visible': True }
+        case ('KeyboardBinder', 'start_interaction_recorder', _): return { 'result_consumer': 'lambda result: print(\'Use result here\')' }
+        case ('KeyboardBinder', 'wait', _): return { 'seconds': 3.5 }
         case ('Desktop', 'set_clipboard_text', _): return { 'text': 'epic text' }
         case ('Desktop', 'exec_command', _): return { 'command': 'explorer https://google.com' }
         case ('Desktop', 'get_process_volume_level', _): return { 'process_name': 'ts3client_win64.exe' }
@@ -79,6 +79,6 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
 
 def get_lambda_parameter_names(module_name: str, function_name: str, arg_name: str):
     match (module_name, function_name, arg_name):
-        case ('Application', 'start_interaction_recorder', 'result_consumer'): return [ 'recording_result' ]
+        case ('KeyboardBinder', 'start_interaction_recorder', 'result_consumer'): return [ 'recording_result' ]
         case ('OBS', 'add_event_listener', 'on_change'): return [ 'new_scene_name' ]
         case _: return []
