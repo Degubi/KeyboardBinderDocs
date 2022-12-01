@@ -27,7 +27,7 @@ def get_example_arg_key_value(arg_name: str, module_name: str, function_name: st
     arg_value_type = type(arg_value)
 
     if arg_value == 'MISSING_ARG_VALUE':
-        print(f'No example arg mapping found for {module_name}.{function_name}: \'{arg_name}\'')
+        print(f'Unmapped argument found for \'{module_name}.{function_name}\': \'{arg_name}\'')
 
     is_lambda_type = arg_value_type == str and arg_value.startswith('lambda')
     formatted_arg_value = f"'{arg_value}'" if arg_value_type == str and not is_lambda_type else get_optional_named_parameter_value(arg_value, module_name, constant_value_to_names)
