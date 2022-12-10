@@ -21,10 +21,12 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('OBS', 'get_is_input_muted'): return [ 'is_muted' ]
         case ('OBS', 'get_input_volume'): return [ 'volume' ]
         case ('VLC', 'get_playlist_items'): return [ 'item_paths' ]
+        case ('VLC', 'get_player_position'): return [ 'position_seconds' ]
         case ('VLC', 'get_player_volume'): return [ 'volume_level' ]
         case ('VLC', 'is_player_paused'): return [ 'is_player_paused' ]
         case ('VLC', 'is_player_playing'): return [ 'is_player_playing' ]
         case ('VLC', 'is_player_stopped'): return [ 'is_player_stopped' ]
+        case ('Youtube', 'get_player_position'): return [ 'position_seconds' ]
         case ('Youtube', 'get_player_volume'): return [ 'volume_level' ]
         case _: return []
 
@@ -75,8 +77,10 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('PremierePro', 'insert_item_at_player_position', _): return { 'item_path': 'Bin1/Bin2/ClipOrSequenceName' }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
         case ('VLC', 'add_item_to_playlist', _): return { 'file_path': 'C:/Users/User/Desktop/In Flames/Subterranean/Stand Ablaze.mp3' }
+        case ('VLC', 'set_player_position', _): return { 'position_seconds': 69 }
         case ('VLC', 'set_player_volume', _): return { 'volume_level': 25 }
         case ('Youtube', 'load_video_by_id', _): return { 'id': 'dQw4w9WgXcQ' }
+        case ('Youtube', 'set_player_position', _): return { 'position_seconds': 69 }
         case ('Youtube', 'set_player_volume', _): return { 'volume_level': 42 }
         case _: return {}
 
