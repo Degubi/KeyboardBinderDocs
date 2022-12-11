@@ -1,14 +1,21 @@
-const contentElement = document.getElementById('content');
-let currentPage = new URLSearchParams(window.location.search).get('page') ?? 'about';
+const ATTRIBUTE_ROUTE_PATH = 'route-path';
 
-window.history.replaceState(currentPage, null, `?page=${currentPage}${window.location.hash}`);
-forceShowPage(currentPage);
+const contentElement = document.getElementById('content');
+const routeButtons = [
+    ...document.getElementById('sidenav').querySelectorAll('.nav-button,.first-level-dropdown-button'),
+    ...document.getElementById('sidenav').getElementsByTagName('module-dropdown-button')
+];
+let currentPagePath = new URLSearchParams(window.location.search).get('page') ?? 'about';
+
+window.history.replaceState(currentPagePath, null, `?page=${currentPagePath}${window.location.hash}`);
+updateActiveRouteButtonStyle(currentPagePath);
+forceShowPage(currentPagePath);
 
 window.addEventListener('popstate', event => {
     const requestedPage = event.state;
 
     if(requestedPage !== null) {
-        currentPage = event.state;
+        currentPagePath = event.state;
         forceShowPage(event.state);
     }
 });
@@ -34,13 +41,20 @@ async function forceShowPage(pagePath) {
 function showPage(pagePath) {
     contentElement.scrollTo(0, 0);
 
-    if(pagePath !== currentPage) {
-        window.history.pushState(currentPage, null, `?page=${pagePath}`);
-        currentPage = pagePath;
+    if(pagePath !== currentPagePath) {
+        window.history.pushState(currentPagePath, null, `?page=${pagePath}`);
+        currentPagePath = pagePath;
+        updateActiveRouteButtonStyle(pagePath);
         return forceShowPage(pagePath);
     }
 
     return null;
+}
+
+/** @param { string } pagePath */
+function updateActiveRouteButtonStyle(pagePath) {
+    routeButtons.forEach(k => k.classList.remove('active-route-button'));
+    routeButtons.find(k => k.getAttribute(ATTRIBUTE_ROUTE_PATH) === pagePath)?.classList.add('active-route-button');
 }
 
 
@@ -51,7 +65,7 @@ window.customElements.define('module-dropdown-button', class extends HTMLElement
     }
 
     connectedCallback() {
-        const modulePagePath = this.getAttribute('module-page-path');
+        const modulePagePath = this.getAttribute(ATTRIBUTE_ROUTE_PATH);
 
         const moduleButton = document.createElement('button');
         moduleButton.className = 'first-level-dropdown-button';
@@ -86,6 +100,6 @@ window.customElements.define('module-dropdown-button', class extends HTMLElement
 // @ts-ignore
 window.toggleDropdownButton = k => k.nextElementSibling.style.display = k.nextElementSibling.style.display === 'block' ? 'none' : 'block';
 // @ts-ignore
-window.showPage = showPage;
+window.handleNavButtonClick = (/**@type { MouseEvent }*/ e) => showPage(e.target.getAttribute(ATTRIBUTE_ROUTE_PATH));
 
 export {};
