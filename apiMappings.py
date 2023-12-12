@@ -10,13 +10,16 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('Desktop', 'get_process_volume_level'): return [ 'volume_level' ]
         case ('Desktop', 'get_clipboard_text'): return [ 'clipboard_text' ]
         case ('Mouse', 'get_cursor_location'): return [ 'x', 'y' ]
+        case ('Keyboard', 'is_modifier_key_down'): return [ 'is_down' ]
         case ('PremierePro', 'list_sequence_names'): return [ 'sequence_names' ]
         case ('PremierePro', 'get_audio_gain_level_from_selection'): return [ 'gain_level' ]
         case ('PremierePro', 'get_media_paths_from_selection'): return [ 'media_paths' ]
         case ('PremierePro', 'get_scale_to_frame_size_from_selection'): return [ 'scale_enabled' ]
         case ('PremierePro', 'get_speed_from_selection'): return [ 'speed' ]
         case ('PremierePro', 'is_track_targeted'): return [ 'is_targeted' ]
-        case ('Keyboard', 'is_modifier_key_down'): return [ 'is_down' ]
+        case ('Gimp', 'create_new_image'): return [ 'image' ]
+        case ('Gimp', 'create_new_layer'): return [ 'layer' ]
+        case ('Gimp', 'list_displayed_images'): return [ 'images' ]
         case ('OBS', 'get_current_scene_name'): return [ 'scene_name' ]
         case ('OBS', 'get_is_input_muted'): return [ 'is_muted' ]
         case ('OBS', 'get_input_volume'): return [ 'volume' ]
@@ -75,6 +78,10 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('PremierePro', 'add_video_effect_to_selection', 'Sharpen'): return { 'effect_name': 'Sharpen', 'properties': '{}' }
         case ('PremierePro', 'add_video_effect_to_selection', _): return { 'effect_name': 'Unknown', 'properties': '{}' }
         case ('PremierePro', 'insert_item_at_player_position', _): return { 'item_path': 'Bin1/Bin2/ClipOrSequenceName' }
+        case ('Gimp', 'create_new_image', _): return { 'width': 128, 'height': 128 }
+        case ('Gimp', 'create_new_layer', _): return { 'name': 'layer1', 'width': 128, 'height': 128, 'opacity': 50, 'image': '$image$' }
+        case ('Gimp', 'display_image', _): return { 'image': '$image$' }
+        case ('Gimp', 'insert_layer', _): return { 'layer': '$layer$', 'image': '$image$' }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
         case ('VLC', 'add_item_to_playlist', _): return { 'file_path': 'C:/Users/User/Desktop/In Flames/Subterranean/Stand Ablaze.mp3' }
         case ('VLC', 'set_player_position', _): return { 'position_seconds': 69 }

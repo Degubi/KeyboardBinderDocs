@@ -1,0 +1,10 @@
+<h1>Gimp module</h1>
+<p>Contains functions used to interact with Gimp</p><br>
+<h2>Importing</h2>
+<div class = "code-example-block"><py-keyword>from </py-keyword><py-module>keyboardBinder </py-module><py-keyword>import </py-keyword><py-module>Gimp</py-module></div>
+<h2>Functions</h2><hr>
+<h3 id = "create_new_image">create_new_image(width: int, height: int) -> ImageHandle</h3><h4>Description:</h4><p>Creates a new image with the given width and height</p><h4>Example:</h4><div class="code-example-block">image = <py-module>Gimp</py-module>.<py-function>create_new_image</py-function>(width = <py-number>128</py-number>, height = <py-number>128</py-number>)</div><hr>
+<h3 id = "create_new_layer">create_new_layer(name: str, width: int, height: int, opacity: int, image: ImageHandle) -> LayerHandle</h3><h4>Description:</h4><p>Creates a new layer with the given name, width, height and opacity</p><h4>Example:</h4><div class="code-example-block">layer = <py-module>Gimp</py-module>.<py-function>create_new_layer</py-function>(name = <py-string>'layer1'</py-string>, width = <py-number>128</py-number>, height = <py-number>128</py-number>, opacity = <py-number>50</py-number>, image = image)</div><hr>
+<h3 id = "display_image">display_image(image: ImageHandle) -> None</h3><h4>Description:</h4><p>Displays the given image</p><h4>Example:</h4><div class="code-example-block"><py-module>Gimp</py-module>.<py-function>display_image</py-function>(image = image)</div><hr>
+<h3 id = "insert_layer">insert_layer(layer: LayerHandle, image: ImageHandle) -> None</h3><h4>Description:</h4><p>Inserts the given layer into the given image</p><h4>Example:</h4><div class="code-example-block"><py-module>Gimp</py-module>.<py-function>insert_layer</py-function>(layer = layer, image = image)</div><hr>
+<h3 id = "list_displayed_images">list_displayed_images() -> list[ImageHandle]</h3><h4>Description:</h4><p>Returns the list of currently displayed images</p><h4>Example:</h4><div class="code-example-block">images = <py-module>Gimp</py-module>.<py-function>list_displayed_images</py-function>()</div>

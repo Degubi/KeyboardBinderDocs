@@ -4,7 +4,7 @@ from itertools import groupby
 from typing import Any
 from apiMappings import get_example_arg_mappings, get_example_return_value_mappings, get_lambda_parameter_names
 
-MODULES_DIR = '../KeyboardBinder/modules/keyboardBinder'
+MODULES_DIR = '../KeyboardBinder/desktop/modules/keyboardBinder'
 
 
 def is_overload_function_template(function: ast.FunctionDef, function_defs: list[ ast.FunctionDef ]):
@@ -24,18 +24,19 @@ def get_optional_named_parameter_value(value: Any, module_name: str, constant_va
 
 def get_example_arg_key_value(arg_name: str, module_name: str, function_name: str, example_arg_value_mappings: dict[str, Any], constant_value_to_names: dict[Any, str]):
     arg_value = example_arg_value_mappings.get(arg_name, 'MISSING_ARG_VALUE')
-    arg_value_type = type(arg_value)
-
     if arg_value == 'MISSING_ARG_VALUE':
         print(f'Unmapped argument found for \'{module_name}.{function_name}\': \'{arg_name}\'')
 
-    is_lambda_type = arg_value_type == str and arg_value.startswith('lambda')
-    formatted_arg_value = f"'{arg_value}'" if arg_value_type == str and not is_lambda_type else get_optional_named_parameter_value(arg_value, module_name, constant_value_to_names)
+    is_string_value_type = type(arg_value) == str
+    is_lambda_type = is_string_value_type and arg_value.startswith('lambda')
+    is_variable_reference = is_string_value_type and arg_value.startswith('$') and arg_value.endswith('$')
     is_named_constant = arg_value in constant_value_to_names
 
     return f'{arg_name} = {module_name}.{constant_value_to_names[arg_value]}' if is_named_constant else \
-           f'{arg_name} = {formatted_arg_value}' if not is_lambda_type else \
-           f'{arg_name} = ' + formatted_arg_value
+           f'{arg_name} = {str(arg_value)[1 : -1]}' if is_variable_reference else \
+           f'{arg_name} = {arg_value}' if is_lambda_type else \
+           f'{arg_name} = \'{arg_value}\'' if is_string_value_type else \
+           f'{arg_name} = {get_optional_named_parameter_value(arg_value, module_name, constant_value_to_names)}'
 
 def syntax_highlight_python_function_call(code: str):
     function_call_ast: ast.Call = ast.parse(code).body[0].value  # type: ignore
@@ -49,6 +50,7 @@ def syntax_highlight_python_function_call(code: str):
             case ast.Constant(builtins.str(value)):   return f'{before_part}<py-string>\'{value}\'</py-string>{after_part}'
             case ast.Constant(builtins.int(value)):   return f'{before_part}<py-number>{value}</py-number>{after_part}'
             case ast.Constant(builtins.float(value)): return f'{before_part}<py-number>{value}</py-number>{after_part}'
+            case ast.Name(name):                      return f'{before_part}{name}{after_part}'
             case ast.Attribute(ast.Name(module), constant): return f'{before_part}<py-module>{module}</py-module>.' + \
                                                                    f'<py-constant>{constant}</py-constant>{after_part}'
             case ast.Lambda(args, body): return f'{before_part}<py-boolean>lambda</py-boolean>' + \
@@ -157,7 +159,8 @@ def generate_module_documentation(module_file: str):
         module_child_nodes = list(ast.iter_child_nodes(module_node))
         is_dict_typedef = lambda k: isinstance(k, ast.Assign) and k.targets[0].id.startswith('__') and not k.targets[0].id == '__INTEGRATION' and k.value.func.id == '__TypedDict'  # type: ignore
 
-        constant_defs = ( k for k in module_child_nodes if isinstance(k, ast.Assign) and not k.targets[0].id.startswith('__'))  # type: ignore
+        value_assigns = [ k for k in module_child_nodes if isinstance(k, ast.Assign) and not k.targets[0].id.startswith('__') ] # type: ignore
+        constant_defs = (k for k in value_assigns if k.targets[0].id.isupper())  # type: ignore
         dict_typing_defs = dict((k.targets[0].id, k.value.args[1]) for k in module_child_nodes if is_dict_typedef(k))  # type: ignore
         function_defs = [ k for k in module_child_nodes if isinstance(k, ast.FunctionDef) and not k.name.startswith('__') ]
         function_defs.sort(key = lambda k: k.name)
@@ -189,6 +192,7 @@ def generate_module_documentation(module_file: str):
 generate_module_documentation('KeyboardBinder.py')
 generate_module_documentation('Blender.py')
 generate_module_documentation('Desktop.py')
+generate_module_documentation('Gimp.py')
 generate_module_documentation('Keyboard.py')
 generate_module_documentation('Mouse.py')
 generate_module_documentation('OBS.py')
