@@ -19,6 +19,8 @@ def get_example_return_value_mappings(function_name: str, module_name: str):
         case ('PremierePro', 'is_track_targeted'): return [ 'is_targeted' ]
         case ('Gimp', 'create_new_image'): return [ 'image' ]
         case ('Gimp', 'create_new_layer'): return [ 'layer' ]
+        case ('Gimp', 'get_active_layer'): return [ 'layer' ]
+        case ('Gimp', 'get_image_size'): return [ 'width', 'height' ]
         case ('Gimp', 'list_displayed_images'): return [ 'images' ]
         case ('OBS', 'get_current_scene_name'): return [ 'scene_name' ]
         case ('OBS', 'get_is_input_muted'): return [ 'is_muted' ]
@@ -82,6 +84,9 @@ def get_example_arg_mappings(function_name: str, module_name: str, overload_name
         case ('Gimp', 'create_new_layer', _): return { 'name': 'layer1', 'width': 128, 'height': 128, 'opacity': 50, 'image': '$image$' }
         case ('Gimp', 'display_image', _): return { 'image': '$image$' }
         case ('Gimp', 'insert_layer', _): return { 'layer': '$layer$', 'image': '$image$' }
+        case ('Gimp', 'get_active_layer', _): return { 'image': '$image$' }
+        case ('Gimp', 'get_image_size', _): return { 'image': '$image$' }
+        case ('Gimp', 'apply_brightness_contrast_filter', _): return { 'brightness': 0.5, 'contrast': 0.25, 'image': '$image$' }
         case ('Twitch', 'create_clip', _): return { 'channel_name': 'shroud' }
         case ('VLC', 'add_item_to_playlist', _): return { 'file_path': 'C:/Users/User/Desktop/In Flames/Subterranean/Stand Ablaze.mp3' }
         case ('VLC', 'set_player_position', _): return { 'position_seconds': 69 }
