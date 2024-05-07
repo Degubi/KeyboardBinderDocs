@@ -1,6 +1,23 @@
 <h1>Premiere Pro Integration</h1>
 <p>Premiere Pro integration is implemented through a custom extension panel</p>
 <br>
+<h2>Pre-Setup</h2>
+<p>
+    To start using the Premiere Pro integration first we need to enable <a href = "https://en.wikipedia.org/wiki/Symbolic_link">symbolic links</a> for non-admin users.<br>
+    This is required so that when the integration files get updated it gets automatically updated inside Premiere too:
+    <ul>
+        <li>Press win + r</li>
+        <li>Enter 'secpol.msc'</li>
+        <li>Navigate to Local Policies -> User Rights Assignment -> Create Symbolic Links</li>
+        <li>Double click to edit</li>
+        <li>Click add user/group and enter your Windows user name</li>
+        <li>Click ok, then apply</li>
+        <li>Press win + r</li>
+        <li>Enter 'gpupdate /force'</li>
+        <li>Wait for it to auto-close</li>
+    </ul>
+</p>
+<br>
 <h2>Setup</h2>
 <p>
     <ul>
